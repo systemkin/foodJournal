@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<h1>Login</h1>
+<form id="loginForm">
+    <label for="login">User ID:</label>
+    <input type="text" id="login" name="login" required>
+    <br>
+    <label for="password">Password:</label>
+    <input type="password" id="password" name="password" required>
+    <br>
+    <button type="submit">Login</button>
+</form>
+<div id="message"></div>
+
+<script>
+    document.getElementById('loginForm').addEventListener('submit', async function(event) {
+        event.preventDefault();
+        const login = document.getElementById('login').value;
+        const password = document.getElementById('password').value;
+
+        const response = await fetch('/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({
+                login: login,
+                password: password
+            })
+        });
+
+        const messageDiv = document.getElementById('message');
+        if (response.ok) {
+            const text = await response.text();
+            messageDiv.innerHTML = text;
+            window.location.href = '/static/welcome.html'; // Redirect to welcome page
+        } else {
+            const errorText = await response.text();
+            messageDiv.innerHTML = `<span style="color: red;">${errorText}</span>`;
+        }
+    });
+</script>
+</body>
+</html>
