@@ -28,7 +28,7 @@ import io.ktor.server.application.*
 import io.ktor.server.auth.*
 
 @Serializable
-data class UserSession(val login: String, val pass: String) : Principal
+data class UserSession(val login: String, val pass: String)
 
 fun Application.configureSecurity() {
     install(CSRF) {
