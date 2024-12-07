@@ -12,7 +12,7 @@ data class ExposedUser(val login: String, val pass: String)
 
 class UserService(database: Database) {
     object Users : Table() {
-        val login = varchar("login", length = 128)
+        val login = varchar("login", length = 128).uniqueIndex()
         val pass = varchar("pass", length = 128)
 
         override val primaryKey = PrimaryKey(login)

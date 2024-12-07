@@ -20,7 +20,6 @@ repositories {
 
 dependencies {
     implementation("org.mindrot:jbcrypt:0.4")
-
     implementation("io.ktor:ktor-server-resources:<ktor_version>")
     implementation(libs.ktor.server.core)
     implementation(libs.ktor.serialization.kotlinx.json)

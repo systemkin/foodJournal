@@ -1,4 +1,3 @@
-/*
 package com.foodjournal
 
 import kotlinx.coroutines.Dispatchers
@@ -9,65 +8,52 @@ import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransacti
 import org.jetbrains.exposed.sql.transactions.transaction
 
 @Serializable
-data class ExposedIncome(val login: String, val pass: String)
+data class ExposedIncome(val login: String, val json: String)
 
-class IncomesSchema(database: Database) {
+class IncomesService(database: Database) {
     object Incomes : Table() {
-        val id = integer("id").autoIncrement()
-        val login = varchar("login", length = 128)
-        val pass = varchar("pass", length = 128)
+        val login = varchar("login", length = 128).uniqueIndex().references(UserService.Users.login)
+        val json = text("json")
 
-        override val primaryKey = PrimaryKey(id)
+        override val primaryKey = PrimaryKey(login)
     }
 
     init {
         transaction(database) {
-            SchemaUtils.create(Users)
+            SchemaUtils.create(Incomes)
         }
     }
 
-    suspend fun create(user: ExposedUser): Int = dbQuery {
-        Users.insert {
-            it[pass] = user.pass
-            it[login] = user.login
-        }[Users.id]
+    suspend fun create(income: ExposedIncome): String = dbQuery {
+        Incomes.insert {
+            it[login] = income.login
+            it[json] = income.json
+        }[Incomes.login]
     }
 
-    suspend fun read(id: Int): ExposedUser? {
+    suspend fun read(login: String): ExposedIncome? {
         return dbQuery {
-            Users.selectAll()
-                .where { Users.id eq id }
-                .map { ExposedUser(it[Users.login], it[Users.pass]) }
+            Incomes.selectAll()
+                .where { Incomes.login eq login }
+                .map { ExposedIncome(it[Incomes.login], it[Incomes.json]) }
                 .singleOrNull()
         }
     }
 
-    suspend fun update(id: Int, user: ExposedUser) {
+    suspend fun update(login: String, income: ExposedIncome) {
         dbQuery {
-            Users.update({ Users.id eq id }) {
-                it[login] = user.login
-                it[pass] = user.pass
+            Incomes.update({ Incomes.login eq login }) {
+                it[json] = income.json
             }
         }
     }
 
-    suspend fun getIdByLogin(login: String): Int? {
-        return dbQuery {
-            Users.selectAll()
-                .where{ Users.login eq login }
-                .map { it[Users.id] }
-                .singleOrNull()
-        }
-    }
-
-    suspend fun delete(id: Int) {
+    suspend fun delete(login: String) {
         dbQuery {
-            Users.deleteWhere { Users.id.eq(id) }
+            Incomes.deleteWhere { Incomes.login eq login }
         }
     }
 
     private suspend fun <T> dbQuery(block: suspend () -> T): T =
         newSuspendedTransaction(Dispatchers.IO) { block() }
 }
-
-*/
