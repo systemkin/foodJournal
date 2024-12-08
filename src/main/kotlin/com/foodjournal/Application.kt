@@ -15,7 +15,12 @@ fun Application.module() {
     install(Authentication) {
         session<UserSession>("auth-session") {
             validate { session ->
-                session
+                if (authenticate(session.login, session.pass)) {
+                    session
+                } else {
+                    null
+                }
+
             }
             challenge {
                 call.respondRedirect("/login")

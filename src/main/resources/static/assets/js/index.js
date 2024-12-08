@@ -25,43 +25,7 @@ async function sendRegisterRequest(login, password) {
 function register() {
     let login = document.getElementById("usernameRegisterLine").value;
     let password = document.getElementById("passwordRegisterLine").value;
-    sendRegisterRequest(login, password).then(() => registerSuccesful(login), (status) => registerFailed(login, status));
-}
-function registerSuccesful(login) {
-    document.getElementById("messagesWindow").innerHTML = login;
-}
-function registerFailed(login, status) {
-    document.getElementById("messagesWindow").innerHTML = status;
-}
-async function createPreference(protein, fat, carbs, title, type) {
-    const response = await fetch("/preferences", {
-        method: "POST",
-        body: JSON.stringify({
-            protein: protein,
-            fat: fat,
-            carbs: carbs,
-            title: title,
-            type: type})
-    })
-    if (response.status === 201) {
-        document.getElementById("messagesWindow").innerHTML = response.status;
-    }
-    else {
-        document.getElementById("messagesWindow").innerHTML = response.status;
-    }
-}
-async function newPreference() {
-    debugger;
-    protein = document.getElementById("proteinLine").value
-    fat = document.getElementById("fatLine").value
-    carbs = document.getElementById("carbsLine").value
-    title = document.getElementById("titleLine").value
-    if(document.getElementById("preferenceType").value == "gramm") {
-        type = 1;
-    } else {
-        type = 0
-    }
-    createPreference(protein, fat, carbs, title, type)
+    sendRegisterRequest(login, password).then(() => registerSuccessful(login), (status) => registerFailed(login, status));
 }
 async function login() {
     let username = document.getElementById("usernameLoginLine").value;
@@ -93,8 +57,97 @@ async function logoff() {
         document.getElementById("messagesWindow").innerHTML = response.status;
     }
 }
+
+
+function registerSuccessful(login) {
+    document.getElementById("messagesWindow").innerHTML = login;
+}
+function registerFailed(login, status) {
+    document.getElementById("messagesWindow").innerHTML = status;
+}
+
+
+async function postMeal(meal) {
+    const mealString = JSON.stringify(meal)
+    const response = await fetch("/incomes", {
+        method: "POST",
+        headers: {
+                        'Content-Type': 'application/json'
+                    },
+        body: JSON.stringify({
+            json: mealString
+        })
+    })
+    document.getElementById("messagesWindow").innerHTML = response.status;
+}
+async function saveMeal() {
+    let meal = {};
+    meal.title = document.getElementById("titi").value;
+    meal.protein = document.getElementById("proi").value;
+    meal.fat = document.getElementById("fati").value;
+    meal.carbs = document.getElementById("cari").value;
+    meal.date = new Date().toISOString().split(".")[0];
+    postMeal(meal)
+    if (document.getElementById("favI").dataset.selected == "1") {
+        postPreference(meal);
+    }
+}
+
+async function savePlate() {
+    let meal = getCraftedMeal();
+    postMeal(meal);
+    if (document.getElementById("favD").dataset.selected== "1") {
+        postPreference(meal);
+    }
+}
+async function saveFullPlate() {
+    let meal = getCraftedMeal();
+    postMeal(meal);
+    if (document.getElementById("favP").dataset.checked == "1") {
+        postPreference(meal);
+    }
+}
+
+
+function getCraftedMeal() {
+    return countMeals(craftingMeal);
+}
+
+function countMeals(meals) {
+    let finalMeal = {};
+    meals.forEach(meal => {
+        let mealKeys = Object.keys(meal);
+        mealKeys.forEach(key => {
+            if (finalMeal[key]) {
+                finalMeal[key] += meal[key];
+            } else {
+                finalMeal[key] = meal[key];
+            }
+        });
+    });
+    return finalMeal;
+}
+
+async function postPreference(preference) {
+    const preferenceString = JSON.stringify(preference);
+    const response = await fetch("/preferences", {
+        method: "POST",
+        headers: {
+                        'Content-Type': 'application/json'
+                    },
+        body: JSON.stringify({
+            json: preferenceString
+        })
+    })
+    document.getElementById("messagesWindow").innerHTML = response.status;
+}
+
+
+/////////SOMEWHAT GOOD UPPER THAN THIS
+/////////SHIT UNDER THIS
+
+
 async function createMeal() {
-    debugger;
     let meal = getCraftedMeal()
     isNow = document.getElementById("nowMealButton").checked;
     let date;
@@ -105,23 +158,7 @@ async function createMeal() {
     }
     await saveMeal(meal, date)
 }
-async function saveMeal(meal, date) {
-    const response = await fetch("/incomes", {
-        method: "POST",
-        body: JSON.stringify({
-            date: date,
-            protein: meal.totalProtein,
-            fat: meal.totalFat,
-            carbs: meal.totalCarbs,
-            title: document.getElementById("titleMealLine").value})
-    })
-    if (response.status === 201) {
-        document.getElementById("messagesWindow").innerHTML = response.status;
-    }
-    else {
-        document.getElementById("messagesWindow").innerHTML = response.status;
-    }
-}
+
 async function getMeals(dateStart, dateEnd) {
     debugger;
     const response = await fetch("/incomes?datestart=" + dateStart + "&dateend=" + dateEnd, {
@@ -148,19 +185,7 @@ async function getResultByDate(date) {
     result = countMeals(meals); // <- Result object
     document.getElementById("messagesWindow").innerHTML = result.totalProtein + "/" + result.totalFat + "/" + result.totalCarbs + "/" + result.calories + "/" + result.fatPercent;
 }
-function countMeals(meals) {
-    let totalProtein = 0;
-    let totalFat = 0;
-    let totalCarbs = 0;
-    meals.forEach(meal => {
-        totalProtein += parseFloat(meal.protein);
-        totalFat += parseFloat(meal.fat);
-        totalCarbs += parseFloat(meal.carbs);
-    });
-    let calories = (totalProtein*4 + totalFat*9 + totalCarbs*4)
-    let fatPercent = (totalFat*9)/calories
-    return {totalProtein, totalFat, totalCarbs, calories, fatPercent};
-}
+
 async function todayResult() {
     debugger;
     today = new Date();
@@ -278,7 +303,6 @@ async function newIngridient() {
     addIngridient(protein, fat, carbs, title, id);
     addToPlate(protein, fat, carbs, title, id);
     lastIngid++;
-    debugger;
     if (document.getElementById("favI").dataset.selected == "1") {
         addFav(protein, fat, carbs, title)
     }
@@ -308,9 +332,7 @@ async function addToPlate(protein, fat, carbs, title, id) {
     
     
 }
-function getCraftedMeal() {
-    return countMeals(craftingMeal);
-}
+
 function recountMeal() {
     result = getCraftedMeal();
     document.getElementById("mealstat").innerHTML = result.totalProtein.toFixed(2) + "/" + result.totalFat.toFixed(2) + "/" + result.totalCarbs.toFixed(2);

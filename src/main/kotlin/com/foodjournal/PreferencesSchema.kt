@@ -11,10 +11,11 @@ import org.jetbrains.exposed.sql.transactions.transaction
 
 @Serializable
 data class ExposedPreference(val id: Int, val login: String, val json: String)
+data class InsertPreference(val login: String, val json: String)
 
 class PreferencesService(database: Database) {
     object Preferences : Table() {
-        val id = integer("id").uniqueIndex()
+        val id = integer("id").uniqueIndex().autoIncrement()
         val login = varchar("login", length = 128).references(UserService.Users.login)
         val json = text("json")
 
@@ -27,7 +28,7 @@ class PreferencesService(database: Database) {
         }
     }
 
-    suspend fun create(preference: ExposedPreference): Int = dbQuery {
+    suspend fun create(preference: InsertPreference): Int = dbQuery {
         Preferences.insert {
             it[login] = preference.login
             it[json] = preference.json

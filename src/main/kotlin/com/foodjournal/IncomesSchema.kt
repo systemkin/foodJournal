@@ -9,10 +9,12 @@ import org.jetbrains.exposed.sql.transactions.transaction
 
 @Serializable
 data class ExposedIncome(val id: Int, val login: String, val json: String)
+data class InsertIncome(val login: String, val json: String)
+
 
 class IncomesService(database: Database) {
     object Incomes : Table() {
-        val id = integer("id").uniqueIndex()
+        val id = integer("id").uniqueIndex().autoIncrement()
         val login = varchar("login", length = 128).references(UserService.Users.login)
         val json = text("json")
 
@@ -25,7 +27,7 @@ class IncomesService(database: Database) {
         }
     }
 
-    suspend fun create(income: ExposedIncome): Int = dbQuery {
+    suspend fun create(income: InsertIncome): Int = dbQuery {
         Incomes.insert {
             it[login] = income.login
             it[json] = income.json

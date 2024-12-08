@@ -27,6 +27,7 @@ import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver
 
 @Serializable
 data class MyPassword(val pass: String)
+data class MyJson(val json: String)
 
 fun Application.configureDatabases() {
     val database = Database.connect(
@@ -125,8 +126,15 @@ fun Application.configureDatabases() {
                 }
             }
             post("/incomes") {
-                val income = call.receive<ExposedIncome>()
-                incomesService.create(income)
+                val session = call.sessions.get<UserSession>()
+                if (session == null) {
+                    call.respondText("No active session", status = HttpStatusCode.Unauthorized)
+                } else {
+                    val json = call.receive<MyJson>().json
+                    val income  = InsertIncome(session.login, json)
+                    incomesService.create(income)
+                    call.respondText("Created successfully", status = HttpStatusCode.OK)
+                }
             }
 
         }
@@ -172,8 +180,15 @@ fun Application.configureDatabases() {
                 }
             }
             post("/preferences") {
-                val preference = call.receive<ExposedPreference>()
-                preferencesService.create(preference)
+                val session = call.sessions.get<UserSession>()
+                if (session == null) {
+                    call.respondText("No active session", status = HttpStatusCode.Unauthorized)
+                } else {
+                    val json = call.receive<MyJson>().json
+                    val preference = InsertPreference(session.login, json)
+                    preferencesService.create(preference)
+                    call.respondText("Created successfully", status = HttpStatusCode.OK)
+                }
             }
 
         }
