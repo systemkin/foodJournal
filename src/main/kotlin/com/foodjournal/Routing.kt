@@ -34,17 +34,7 @@ import io.ktor.server.routing.*
 
 fun Application.configureRouting() {
     install(io.ktor.server.resources.Resources)
-    install(Authentication) {
-        session<UserSession>("auth-session") {
-            validate { session ->
-                session
-            }
-            challenge {
-                call.respondRedirect("/login")
-            }
 
-        }
-    }
     install(StatusPages) {
         exception<Throwable> { call, cause ->
             call.respondText(text = "500: $cause" , status = HttpStatusCode.InternalServerError)

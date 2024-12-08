@@ -33,6 +33,7 @@ import org.mindrot.jbcrypt.BCrypt
 data class UserSession(val login: String, val pass: String)
 
 fun Application.configureSecurity() {
+
     install(CSRF) {
         // tests Origin is an expected value
         allowOrigin("http://localhost:8080")

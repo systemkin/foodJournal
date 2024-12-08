@@ -1,12 +1,329 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
-</head>
-<body>
-<h1>Food Journal</h1>
-<p><a href="login.html">Login</a></p>
-</body>
+<html>
+	<head>
+		<title>Журнал питания</title>
+		<link rel="stylesheet" href="assets/css/index.css" />
+		<link rel="icon" type="image/x-icon" href="assets/images/favicon.ico">
+	</head>
+	<body style="font-family: 'Lexend Deca'; display: flex; flex-direction: column; height: 100%;">
+		<div id = "header", class = "header">
+			<div id = "headerDivisorManager" class = "headerDivisorManager">
+				<div id = "helperButtonWrapper" class = "helperButtonWrapper" onclick="showMenu()">
+					<img class = "buttonImg", style = "width: 60px" src = "assets/images/menu.png">
+				</div>
+				<div id = "accountWrapper" class = "accountWrapper">
+					<div id = "usernameSign" class = "marginedText">Account
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<div id = "mainWindow", class = "mainWindow">
+			
+			
+
+			<div class = "subBlock">
+				<div class = "verticalFlexer">
+					<center>
+						<div class = "title">
+							Create dish
+						</div>
+					</center>
+						<div class = "horizontalFlexer textinput margined">
+							<div  class = "marginedText black">
+								Title
+							</div>
+							<div class = "select long" id = "sl2"> 
+								<input id = titi  class = "select" onfocus="select1('sl2')" onfocusout="unfocus1('sl2')">
+								<img class = "buttonImg small titleselect" src = "assets/images/subinput.png">
+							</div>
+						</div>
+						<div class = "horizontalFlexer textinput margined">
+							<div class = "marginedText black">
+								Per
+							</div>
+							<div class = "selectbox" id = "sl2" > 
+								<select id = "selm" style = "width: 100%" onchange = "changedMeasurement()">
+									<option value="serv">1 Serving</option>
+									<option value="gram">100 g</option>
+								</select>
+							</div>
+						</div>
+						<div class = "horizontalFlexer textinput margined">
+							<div class = "marginedText black padded">
+								- Protein
+							</div>
+							<input id = "proi" class = "int", placeholder = "0", type = "number" >
+						</div>
+						<div class = "horizontalFlexer textinput margined">
+							<div class = "marginedText black padded">
+								- Fat
+							</div>
+							<input id = "fati" class = "int", placeholder = "0", type = "number" >
+						</div>
+						<div class = "horizontalFlexer textinput margined">
+							<div class = "marginedText black padded">
+								- Carbs
+							</div>
+							<input id = "cari" class = "int", placeholder = "0", type = "number" >
+						</div>
+						<div class = "horizontalFlexer textinput margined">
+							<div id = meastext class = "marginedText black padded">
+								- Servings
+							</div>
+							<input id = "amni" class = "int", placeholder = "1", pattern="">
+						</div>
+						<div class = "realDiv" style = "flex:1"></div>
+
+						<div class = "horizontalFlexer textinput margined">
+							<div class = "marginedText black">
+								Add to favorites
+							</div>
+							
+							<button id="favI"class = "checkmark" data-selected="0" onclick="selectButton('favI')">
+							</button>
+						</div>
+						<center>
+							<div class = "button" onclick ="newIngridient()" >
+								Add to plate
+							</div>
+						</center>
+						<center>
+							<div class = "button" >
+								Save now
+							</div>
+						</center>
+						
+				</div>
+				
+			</div>
+			<div class = "subBlock">
+				<div class = "verticalFlexer">
+					<center>
+						<div class = "title">
+							Plate
+						</div>
+					</center>
+					<div class = "horizontalFlexer textinput margined" style="margin-bottom:20px">
+						<div class = "marginedText black">
+							Title
+						</div>
+						<div class = "select long" id = "sl2"> 
+							<input class = "select" onfocus="select1('sl2')" onfocusout="unfocus1('sl2')">
+							<img class = "buttonImg small titleselect" src = "assets/images/subinput.png">
+						</div>
+					</div>
+					<div class = "horizontalFlexer flexed">
+						<div id = mealstat class = "marginedText black" style="flex:1">
+							0/0/0
+						</div>
+						<div id = mealkkal class = "marginedText black"style="flex:1; text-align: center">
+							0kkal
+						</div>
+						<div id = mealprecent class = "marginedText black"style="flex:1; text-align: right">
+							0/0/0%
+						</div>
+					</div>
+					<div class = "horizontalFlexer textinput margined">
+						<div class = "marginedText black">
+							Add to favorites
+						</div>
+						
+						<button id="favD"class = "checkmark" data-selected="0" onclick="selectButton('favD')">
+						</button>
+					</div>
+					<center>
+						<div class = "button" onclick = "plate()">
+							Edit
+						</div>
+					</center>
+					<center>
+						<div class = "button" >
+							Save now
+						</div>
+					</center>
+						
+				</div>
+				
+			</div>
+			<div style = "flex:1"></div>
+			<div class = "subBlock">
+				<div class = "verticalFlexer">
+					<div class = "title">Today results</div>
+								<div class = "horizontalFlexer flexed">
+									<div class = "marginedText black" style="flex:1">
+										Protein
+									</div>
+									<div class = "marginedText black"style="flex:1; text-align: center">
+										120g
+									</div>
+									<div class = "marginedText black"style="flex:1; text-align: right">
+										10%
+									</div>
+								</div>
+								<div class = "horizontalFlexer flexed">
+									<div class = "marginedText black"style="flex:1">
+										Fat
+									</div>
+									<div class = "marginedText black"style="flex:1; text-align: center">
+										120g
+									</div>
+									<div class = "marginedText black"style="flex:1; text-align: right">
+										10%
+									</div>
+								</div>
+								<div class = "horizontalFlexer flexed">
+									<div class = "marginedText black"style="flex:1">
+										Fat
+									</div>
+									<div class = "marginedText black"style="flex:1; text-align: center">
+										120g
+									</div>
+									<div class = "marginedText black"style="flex:1; text-align: right">
+										10%
+									</div>
+								</div>
+						
+				</div>
+				
+			</div>
+			
+		</div>
+		<div id = "plate" style="display:none; margin-bottom: 10px !important;" class = "mainWindow">
+			<div class = "subBlock" style = "flex:1">
+					<div class = "verticalFlexer spaceBetween center">
+							<div class = "title">
+								Plate
+							</div>
+							<div class = "horizontalFlexer textinput margined">
+								<div class = "marginedText black">
+									Title
+								</div>
+								<div class = "select long" id = "sl1"> 
+									<input class = "select" onfocus="select1('sl1')" onfocusout="unfocus1('sl1')">
+									<img class = "buttonImg small titleselect" src = "assets/images/subinput.png">
+								</div>
+							</div>
+							<div class = "realDiv"></div>
+							<div id = "plateBox" class = "scrollingBox">
+							</div>
+							<div class = "realDiv"></div><div class = "realDiv"></div>
+							<div class = "horizontalFlexer textinput">
+								<div class = "marginedText black">
+									Add to favorites
+								</div>
+								<button id="favP"class = "checkmark" data-selected="0" onclick="selectButton('favP')">
+								</button>
+							</div>
+							<div class = "realDiv"></div>
+							<div class = "button">
+								Save now
+							</div>
+					</div>
+					
+				</div>
+		</div>		
+		<div id = "menu", class = "menu", data-opened = "0", style="display:none">
+			<div class = "verticalFlexer">
+				<div class = menuOption onclick = "closeExcept('mainWindow')">
+					Main page
+				</div>
+				<div class = menuOption onclick = "closeExcept('plate')">
+					Plate 
+				</div>
+				<div class = menuOption onclick = "closeExcept('favorites')">
+					Favorites
+				</div>
+				<div class = menuOption onclick = "closeExcept('results')">
+					Results
+				</div>
+				<div class = menuOption onclick = "closeExcept('goals')">
+					Goals
+				</div>
+				<div class = menuOption onclick = "closeExcept('settings')">
+					Settings
+				</div>
+				<div class = menuOption onclick = "closeExcept('info')">
+					Info
+				</div>
+			</div>
+		</div>
+
+		<div id = "favorites", class = "mainWindow" style = "display:none">
+			
+			
+
+			<div class = "subBlock" style = "height: 100%;">
+				<div class = "title">
+					Favorites
+				</div>
+				<div id = "favBox" class = "scrollingBox" style = "width: 100%; box-sizing: border-box;">
+				</div>
+			</div>
+			
+		</div>
+
+		<!--
+		<div id="usernameLine">
+			<br>
+			<input id="usernameRegisterLine">
+			<input id="passwordRegisterLine">
+			<button onclick = "register()">Зарегистрироваться</button>
+			<br>
+			<input id="usernameLoginLine">
+			<input id="passwordLoginLine">
+			<button onclick = "login()">Логин</button>
+			<br>
+		</div>
+		
+		<button onclick = "logoff()">Выйти</button>
+		<br>
+		<input id="proteinLine", placeholder="Белок">
+		<input id="fatLine", placeholder="Жир">
+		<input id="carbsLine", placeholder="Углеводы">
+		<input id="titleLine", placeholder="Название">
+		<label for="preferenceType">в</label>
+		<select name="preferenceType" id="preferenceType">
+			<option value="gramm">100 граммах</option>
+			<option value="pcs">1 штуке</option>
+		</select>
+		<br>
+		<button onclick = "newPreference()">Добавить в избранное</button>
+		<br>
+		<br>
+		<div id="preferenceDropdownMenu">
+			Выбрать из избранных
+			<div id = "menuHider", style="display: none;">
+				<div>Выбрать из избранных</div>
+			</div>
+		</div>
+		<br>
+		<input id="titleMealLine", placeholder="title">
+		<label for="mealType">в</label>
+		<select name="mealType" id="mealType", onchange="changeMealType()">
+			<option value="gramm">100 граммах</option>
+			<option value="pcs">1 штуке</option>
+		</select>
+		<input id="proteinMealLine", placeholder="protein">
+		<input id="fatMealLine", placeholder="fat">
+		<input id="carbsMealLine", placeholder="carbs">
+		<input id="mealQuantity", placeholder="Грамм">
+		
+		<br>
+		<button onclick = "newIngridient()">Добавить ингридиент</button>
+		<div id = "craftingMeal">
+
+		</div>
+		<br>
+		
+		<br>
+		<span>Сейчас</span><input type = "checkbox" id ="nowMealButton">
+		<input id="dateMealLine", placeholder="date">
+		<button onclick = "createMeal()">Создать запись</button>
+		<br>
+		<br>
+		<input id="hourBorder", value="0">
+		<button onclick = "todayResult()">Информация за сегодня</button>
+		<div id = "messagesWindow">-</div>-->
+	<script src="assets/js/index.js"></script>
+	</body>
 </html>
