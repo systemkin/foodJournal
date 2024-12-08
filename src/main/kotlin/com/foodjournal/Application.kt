@@ -1,6 +1,7 @@
 package com.foodjournal
 
 import io.ktor.server.application.*
+import org.jetbrains.exposed.sql.Database
 
 fun main(args: Array<String>) {
     io.ktor.server.netty.EngineMain.main(args)

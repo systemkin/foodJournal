@@ -52,33 +52,17 @@ fun Application.configureRouting() {
     }
 
     routing {
-        get("/") {
-            call.respondText(hashPassword("BOOOOBA"))
-        }
-        get<Articles> { article ->
-            // Get all articles ...
-            call.respond("List of articles sorted starting from ${article.sort}")
-        }
-        // Static plugin. Try to access `/static/index.html`
         staticResources("/static", "static")
-        authenticate("auth-session") {
-            get("/checkAuth") {
-                // Retrieve the session
-                val session = call.sessions.get<UserSession>()
 
-                // Check if the session exists
-                if (session != null) {
-                    call.respondText("Hello, ${session.login}!")
-                } else {
-                    call.respondText("No active session", status = HttpStatusCode.Unauthorized)
-                }
-            }
-        }
-
+        //Login to app
         post("/login") {
             val parameters = call.receiveParameters()
-            val login = parameters["login"] ?: return@post call.respondText("Missing login", status = HttpStatusCode.BadRequest)
-            val pass = parameters["password"] ?: return@post call.respondText("Missing password", status = HttpStatusCode.BadRequest)
+            val login =
+                parameters["login"] ?: return@post call.respondText("Missing login", status = HttpStatusCode.BadRequest)
+            val pass = parameters["password"] ?: return@post call.respondText(
+                "Missing password",
+                status = HttpStatusCode.BadRequest
+            )
 
             if (authenticate(login, pass)) {
                 call.sessions.set(UserSession(login, pass))
@@ -88,29 +72,10 @@ fun Application.configureRouting() {
             }
         }
 
-
-    }
-
-}
-fun authenticate(login: String, pass: String): Boolean {
-    return transaction {
-        UserService.Users.selectAll()
-            .where { UserService.Users.login eq login }
-            .map { it[UserService.Users.pass] }
-            .singleOrNull()
-            ?.let { storedPassword ->
-                verifyPassword(pass, storedPassword)
-            } ?: false
+        //logoff
+        delete("/auth") {
+            call.sessions.clear<UserSession>()
+            call.respondText("Logged out successfully", status = HttpStatusCode.OK)
+        }
     }
 }
-fun hashPassword(password: String): String {
-    return BCrypt.hashpw(password, BCrypt.gensalt())
-}
-
-fun verifyPassword(plainPassword: String, hashedPassword: String): Boolean {
-    return BCrypt.checkpw(plainPassword, hashedPassword)
-}
-
-@Serializable
-@Resource("/articles")
-class Articles(val sort: String? = "new")

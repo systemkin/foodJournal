@@ -26,7 +26,7 @@ class UserService(database: Database) {
 
     suspend fun create(user: ExposedUser) = dbQuery {
         Users.insert {
-            it[pass] = user.pass
+            it[pass] = hashPassword(user.pass)
             it[login] = user.login
         }
     }
@@ -40,12 +40,10 @@ class UserService(database: Database) {
         }
     }
 
-    suspend fun update(login: String, user: ExposedUser) {
+    suspend fun update(user: ExposedUser) {
         dbQuery {
-            Users.update({ Users.login eq login }) {
-                //Why i cant?
-                //it[login] = user.login
-                it[pass] = user.pass
+            Users.update({ Users.login eq user.login }) {
+                it[pass] = hashPassword(user.pass)
             }
         }
     }

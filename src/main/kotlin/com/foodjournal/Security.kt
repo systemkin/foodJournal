@@ -26,6 +26,8 @@ import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver
 import io.ktor.server.sessions.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
+import org.jetbrains.exposed.sql.transactions.transaction
+import org.mindrot.jbcrypt.BCrypt
 
 @Serializable
 data class UserSession(val login: String, val pass: String)
@@ -38,8 +40,6 @@ fun Application.configureSecurity() {
         // tests Origin matches Host header
         originMatchesHost()
 
-        // custom header checks
-        //checkHeader("X-CSRF-Token")
     }
     install(Sessions) {
         cookie<UserSession>("user_session") {
@@ -47,5 +47,26 @@ fun Application.configureSecurity() {
             cookie.maxAgeInSeconds = 60*60*24*30
         }
     }
+}
 
+//TODO: Rewrite (Why use Service.Users if like service is for abstracting from it. Also what a hell)
+//Global UserService?
+//Or keep it as it is is good approach?
+fun authenticate(login: String, pass: String): Boolean {
+    return transaction {
+        UserService.Users.selectAll()
+            .where { UserService.Users.login eq login }
+            .map { it[UserService.Users.pass] }
+            .singleOrNull()
+            ?.let { storedPassword ->
+                verifyPassword(pass, storedPassword)
+            } ?: false
     }
+}
+fun hashPassword(password: String): String {
+    return BCrypt.hashpw(password, BCrypt.gensalt())
+}
+
+fun verifyPassword(plainPassword: String, hashedPassword: String): Boolean {
+    return BCrypt.checkpw(plainPassword, hashedPassword)
+}

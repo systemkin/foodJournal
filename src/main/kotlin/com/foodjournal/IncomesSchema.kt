@@ -8,14 +8,15 @@ import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransacti
 import org.jetbrains.exposed.sql.transactions.transaction
 
 @Serializable
-data class ExposedIncome(val login: String, val json: String)
+data class ExposedIncome(val id: Int, val login: String, val json: String)
 
 class IncomesService(database: Database) {
     object Incomes : Table() {
-        val login = varchar("login", length = 128).uniqueIndex().references(UserService.Users.login)
+        val id = integer("id").uniqueIndex()
+        val login = varchar("login", length = 128).references(UserService.Users.login)
         val json = text("json")
 
-        override val primaryKey = PrimaryKey(login)
+        override val primaryKey = PrimaryKey(id)
     }
 
     init {
@@ -24,33 +25,32 @@ class IncomesService(database: Database) {
         }
     }
 
-    suspend fun create(income: ExposedIncome): String = dbQuery {
+    suspend fun create(income: ExposedIncome): Int = dbQuery {
         Incomes.insert {
             it[login] = income.login
             it[json] = income.json
-        }[Incomes.login]
+        }[Incomes.id]
     }
 
-    suspend fun read(login: String): ExposedIncome? {
+    suspend fun read(login: String): List<ExposedIncome> {
         return dbQuery {
             Incomes.selectAll()
                 .where { Incomes.login eq login }
-                .map { ExposedIncome(it[Incomes.login], it[Incomes.json]) }
-                .singleOrNull()
+                .map { ExposedIncome(it[Incomes.id], it[Incomes.login], it[Incomes.json]) }
         }
     }
-
-    suspend fun update(login: String, income: ExposedIncome) {
+    //Mess
+    suspend fun update(income: ExposedIncome) {
         dbQuery {
-            Incomes.update({ Incomes.login eq login }) {
+            Incomes.update({ (Incomes.id eq income.id) and (Incomes.login eq income.login)}) {
                 it[json] = income.json
             }
         }
     }
 
-    suspend fun delete(login: String) {
+    suspend fun delete(id: Int, login: String) {
         dbQuery {
-            Incomes.deleteWhere { Incomes.login eq login }
+            Incomes.deleteWhere { (Incomes.id eq id) and (Incomes.login eq login)}
         }
     }
 
