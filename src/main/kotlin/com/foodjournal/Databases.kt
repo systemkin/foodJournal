@@ -25,6 +25,9 @@ import kotlinx.serialization.Serializable
 import org.jetbrains.exposed.sql.*
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver
 
+@Serializable
+data class MyPassword(val pass: String)
+
 fun Application.configureDatabases() {
     val database = Database.connect(
         url = "jdbc:mysql://localhost:3306/auth",
@@ -40,18 +43,20 @@ fun Application.configureDatabases() {
         //Create account
         post("/accounts") {
             val user = call.receive<ExposedUser>()
-            userService.create(user);
+            try {
+                userService.create(user);
+            } catch (e: org.jetbrains.exposed.exceptions.ExposedSQLException) {
+                call.respondText("User already exists", status = HttpStatusCode.Conflict)
+            }
+                call.respondText("User created", status = HttpStatusCode.OK)
         }
 
 
         authenticate("auth-session") {
                 //Change password
                 put("/accounts") {
-                    val parameters = call.receiveParameters()
+                    val pass = call.receive<MyPassword>().pass
                     val session = call.sessions.get<UserSession>()
-
-                    val pass = parameters["password"] ?: return@put call.respondText(
-                        "Missing password", status = HttpStatusCode.BadRequest)
                     if (session == null) {
                         call.respondText("No active session", status = HttpStatusCode.Unauthorized)
                     } else {
@@ -114,9 +119,8 @@ fun Application.configureDatabases() {
                     call.respondText("No active session", status = HttpStatusCode.Unauthorized)
                 } else {
                     val login = session.login
-                    val id = call.parameters["id"]?.toInt() ?: throw IllegalArgumentException("Invalid ID")
-                    val json = call.parameters["json"]?: throw IllegalArgumentException("Invalid JSOn")
-                    incomesService.update(ExposedIncome(id, login, json))
+                    val income = call.receive<ExposedIncome>()
+                    incomesService.update(ExposedIncome(income.id, login, income.json))
                     call.respondText("Updated successfully", status = HttpStatusCode.OK)
                 }
             }
@@ -160,10 +164,10 @@ fun Application.configureDatabases() {
                 if (session == null) {
                     call.respondText("No active session", status = HttpStatusCode.Unauthorized)
                 } else {
+                    //TODO: cause login is bound to session maybe redo this? also in incomes.
                     val login = session.login
-                    val id = call.parameters["id"]?.toInt() ?: throw IllegalArgumentException("Invalid ID")
-                    val json = call.parameters["json"] ?: throw IllegalArgumentException("Invalid JSOn")
-                    preferencesService.update(ExposedPreference(id, login, json))
+                    val preference = call.receive<ExposedPreference>()
+                    preferencesService.update(ExposedPreference(preference.id, login, preference.json))
                     call.respondText("Updated successfully", status = HttpStatusCode.OK)
                 }
             }

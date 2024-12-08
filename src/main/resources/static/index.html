@@ -32,8 +32,8 @@
 							<div  class = "marginedText black">
 								Title
 							</div>
-							<div class = "select long" id = "sl2"> 
-								<input id = titi  class = "select" onfocus="select1('sl2')" onfocusout="unfocus1('sl2')">
+							<div class = "select long" id = "sl3">
+								<input id = titi  class = "select" onfocus="select1('sl3')" onfocusout="unfocus1('sl3')">
 								<img class = "buttonImg small titleselect" src = "assets/images/subinput.png">
 							</div>
 						</div>
@@ -41,7 +41,7 @@
 							<div class = "marginedText black">
 								Per
 							</div>
-							<div class = "selectbox" id = "sl2" > 
+							<div class = "selectbox">
 								<select id = "selm" style = "width: 100%" onchange = "changedMeasurement()">
 									<option value="serv">1 Serving</option>
 									<option value="gram">100 g</option>
@@ -224,6 +224,9 @@
 		</div>		
 		<div id = "menu", class = "menu", data-opened = "0", style="display:none">
 			<div class = "verticalFlexer">
+				<div class = menuOption onclick = "closeExcept('account')">
+					Account
+				</div>
 				<div class = menuOption onclick = "closeExcept('mainWindow')">
 					Main page
 				</div>
@@ -247,7 +250,6 @@
 				</div>
 			</div>
 		</div>
-
 		<div id = "favorites", class = "mainWindow" style = "display:none">
 			
 			
@@ -262,20 +264,19 @@
 			
 		</div>
 
-		<!--
-		<div id="usernameLine">
-			<br>
-			<input id="usernameRegisterLine">
-			<input id="passwordRegisterLine">
+
+
+		<div id = "account", class = "mainWindow" style = "display:none">
+			<input id = "usernameRegisterLine" placeholder = "Login">
+			<input id = "passwordRegisterLine" placeholder = "Password">
 			<button onclick = "register()">Зарегистрироваться</button>
-			<br>
 			<input id="usernameLoginLine">
 			<input id="passwordLoginLine">
 			<button onclick = "login()">Логин</button>
-			<br>
+			<button onclick = "logoff()">Выйти</button>
 		</div>
-		
-		<button onclick = "logoff()">Выйти</button>
+		<!--
+
 		<br>
 		<input id="proteinLine", placeholder="Белок">
 		<input id="fatLine", placeholder="Жир">

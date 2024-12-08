@@ -10,6 +10,8 @@ fun main(args: Array<String>) {
 }
 
 fun Application.module() {
+    //WHAT A HELL? I need to put it somewhere
+    //TODO: Replace it somewhere not here
     install(Authentication) {
         session<UserSession>("auth-session") {
             validate { session ->

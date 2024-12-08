@@ -2,16 +2,19 @@ let loggedIn = false;
 let timeOffset = new Date().getTimezoneOffset()/(-60)
 let craftingMeal = []
 let menuState = false;
-modalWindows = ["mainWindow", "menu", "plate", "favorites", "results", "goals", "settings", "info"];
+modalWindows = ["account", "mainWindow", "menu", "plate", "favorites", "results", "goals", "settings", "info"];
 let lastIngid = 0;
 
 
 async function sendRegisterRequest(login, password) {
     const response = await fetch("/accounts", {
         method: "POST",
+        headers: {
+                'Content-Type': 'application/json'
+            },
         body: JSON.stringify({
-            username: login,
-            password: password
+            login: login,
+            pass: password
         })
     });
     if (response.status === 200)
@@ -63,11 +66,14 @@ async function newPreference() {
 async function login() {
     let username = document.getElementById("usernameLoginLine").value;
     let password = document.getElementById("passwordLoginLine").value;
-    const response = await fetch("/auth", {
+    const response = await fetch("/login", {
         method: "POST",
+        headers: {
+            'Content-Type': 'application/json'
+        },
         body: JSON.stringify({
-            username: username,
-            password: password})
+            login: username,
+            pass: password})
     })
     if (response.status === 200) {
         document.getElementById("messagesWindow").innerHTML = response.status;
@@ -77,8 +83,8 @@ async function login() {
     }
 }
 async function logoff() {
-    const response = await fetch("/logoff", {
-        method: "POST",
+    const response = await fetch("/login", {
+        method: "DELETE",
     })
     if (response.status === 200) {
         document.getElementById("messagesWindow").innerHTML = response.status;

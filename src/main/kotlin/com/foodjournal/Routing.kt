@@ -46,16 +46,10 @@ fun Application.configureRouting() {
 
         //Login to app
         post("/login") {
-            val parameters = call.receiveParameters()
-            val login =
-                parameters["login"] ?: return@post call.respondText("Missing login", status = HttpStatusCode.BadRequest)
-            val pass = parameters["password"] ?: return@post call.respondText(
-                "Missing password",
-                status = HttpStatusCode.BadRequest
-            )
-
-            if (authenticate(login, pass)) {
-                call.sessions.set(UserSession(login, pass))
+            val user = call.receive<ExposedUser>()
+            if (authenticate(user.login, user.pass)) {
+                call.sessions.set(UserSession(user.login, user.pass))
+                val login = user.login
                 call.respondText("Logged in as $login")
             } else {
                 call.respondText("Invalid credentials", status = HttpStatusCode.Unauthorized)
@@ -63,7 +57,7 @@ fun Application.configureRouting() {
         }
 
         //logoff
-        delete("/auth") {
+        delete("/login") {
             call.sessions.clear<UserSession>()
             call.respondText("Logged out successfully", status = HttpStatusCode.OK)
         }
