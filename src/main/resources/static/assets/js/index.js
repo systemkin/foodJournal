@@ -2,8 +2,12 @@ let loggedIn = false;
 let timeOffset = new Date().getTimezoneOffset()/(-60)
 let craftingMeal = []
 let menuState = false;
+let userIncomes = [];
+let userGoals = {protein:-1, fat:-1, carbs:-1};
+debugger;
 modalWindows = ["account", "mainWindow", "menu", "plate", "favorites", "results", "goals", "settings", "info"];
 let lastIngid = 0;
+let fav_id = 0
 
 
 async function sendRegisterRequest(login, password) {
@@ -82,32 +86,64 @@ async function postMeal(meal) {
 }
 async function saveMeal() {
     let meal = {};
-    meal.title = document.getElementById("titi").value;
-    meal.protein = document.getElementById("proi").value;
-    meal.fat = document.getElementById("fati").value;
-    meal.carbs = document.getElementById("cari").value;
-    meal.date = new Date().toISOString().split(".")[0];
-    postMeal(meal)
-    if (document.getElementById("favI").dataset.selected == "1") {
-        postPreference(meal);
+    let quantity = document.getElementById("amni").value
+    if(document.getElementById("selm").value == "gram") {
+        if (quantity == "") {quantity = 100}
+        quantity /= 100;
+    } else {
+        if (quantity == "") {quantity = 1}
     }
+    meal.title = document.getElementById("titi").value
+    if (meal.title == "") {
+        meal.title = "No Title";
+    };
+    meal.protein = quantity*document.getElementById("proi").value;
+    if (meal.protein == "") {
+            meal.protein = "0";
+    };
+    meal.fat = quantity*document.getElementById("fati").value;
+    if (meal.fat == "") {
+                meal.fat = "0";
+        };
+    meal.carbs = quantity*document.getElementById("cari").value;
+    if (meal.carbs == "") {
+        meal.carbs = "0";
+    };
+    meal.date = new Date().toISOString().split(".")[0];
+    meal.type = document.getElementById("selm").value;
+    if (document.getElementById("favI").dataset.selected == "1") {
+            if (meal.title == "") {
+                document.getElementById("messagesWindow").innerHTML = "Missing title";
+                return;
+
+            } else {
+                postPreference(meal);
+            }
+    }
+    postMeal(meal)
+
 }
 
-async function savePlate() {
-    let meal = getCraftedMeal();
-    postMeal(meal);
-    if (document.getElementById("favD").dataset.selected== "1") {
-        postPreference(meal);
-    }
-}
 async function saveFullPlate() {
     let meal = getCraftedMeal();
+    meal.title = document.getElementById("titlePlate").value;
+    if (meal.title == "")
+        meal.title = "No Title";
     postMeal(meal);
-    if (document.getElementById("favP").dataset.checked == "1") {
+    if (document.getElementById("favD").dataset.selected == "1") {
         postPreference(meal);
     }
 }
-
+async function savePlate() {
+    let meal = getCraftedMeal();
+    meal.title = document.getElementById("plateTitle2").value;
+        if (meal.title == "")
+            meal.title = "No Title";
+    postMeal(meal);
+    if (document.getElementById("favP").dataset.selected == "1") {
+        postPreference(meal);
+    }
+}
 
 function getCraftedMeal() {
     return countMeals(craftingMeal);
@@ -142,6 +178,161 @@ async function postPreference(preference) {
     document.getElementById("messagesWindow").innerHTML = response.status;
 }
 
+async function getPrefs() {
+    const response = await fetch("/preferences", {
+        method: "GET",
+        headers: {
+            'Content-Type': 'application/json'
+        },
+    });
+    if (response.status === 200) {
+        preferences = await response.json();
+        return preferences
+    }
+    else throw response.status;
+}
+let preferences;
+getPrefs().then(() => {rebuildFavs()});
+
+function rebuildFavs() {
+   fav = document.getElementById("favBox")
+   fav.innerHTML = "";
+   preferences.forEach(pref => {
+       preference = JSON.parse(pref.json);
+       fav_id++;
+       elem = document.createElement("div");
+       elem.style = "border: solid 2px black; border-radius: 5px; margin-bottom: 10px;"
+       elem.id = "FAVBOX_" + pref.id;
+       elem.className = "plateElem";
+       elem.innerHTML = `
+       <div style='display:flex; flex-direction: row; justify-content: space-between; padding-top:10px; padding-right:10px'>
+        <div style='display:flex; flex-direction: column; padding: 20px 30px 20px 30pxж'>
+         <div style='display:flex; flex-direction: row; justify-content: space-between; padding-right: 10px;'>
+          <span> `+preference.title+`:</span>
+        </div>
+       <span>`+preference.protein+`/`+preference.fat+`/`+preference.carbs+` - ` + (preference.protein*4+preference.fat*9+preference.carbs*4)+`kcal</span>
+      </div>
+      <img class = "buttonImg", style = "width: 60px; height:60px" src = "assets/images/delete.png" onclick = "deleteFavorites('` + pref.id + `')">
+    </div>`;
+    fav.appendChild(elem);
+    })
+}
+
+async function getGoals() {
+    const response = await fetch("/goals", {
+        method: "GET",
+        headers: {
+            'Content-Type': 'application/json'
+        },
+    });
+    if (response.status === 200) {
+        goals = await response.json();
+        return goals
+    } else if (response.status === 204) return null
+    else throw response.status;
+}
+
+
+
+
+
+
+
+function showPrefs(element, sorter) {
+    debugger;
+    element = document.getElementById(element);
+    element.innerHTML = "";
+    let prefType = "";
+    if (document.getElementById(sorter) != null)
+        prefType = document.getElementById(sorter).value;
+    preferences.forEach(preference => {
+        let pref = JSON.parse(preference.json)
+        if (pref.title.includes(prefType)) {
+            elem = document.createElement("div")
+            elem.className = "dropdownElement";
+            let kcal =  pref.protein*4+pref.fat*9+pref.carbs*4;
+            elem.innerHTML = pref.title + ": " + pref.protein + "/" + pref.fat + "/" + pref.carbs + "<br>" + kcal + "kcal";
+            elem.setAttribute( "onClick", "selectDishPreference('"+ JSON.stringify(pref) +"');" );
+            element.appendChild(elem);
+        }
+    })
+    element.style = "display: flex;";
+}
+function selectDishPreference(string) {
+    debugger;
+    dish = JSON.parse(string);
+    if (dish.type == "gram") {
+        document.getElementById("selm").value = "gram";
+    } else {
+        document.getElementById("selm").value = "serv"
+    }
+    document.getElementById("proi").value = dish.protein;
+    document.getElementById("fati").value = dish.fat;
+    document.getElementById("cari").value = dish.carbs;
+}
+
+async function getIncomes() {
+    const response = await fetch("/incomes", {
+        method: "GET",
+    })
+    if (response.status === 200) {
+        return response.json();
+    }
+    else if (response.status === 204)
+        return [];
+    else {
+        document.getElementById("messagesWindow").innerHTML = response.status;
+    }
+}
+debugger;
+getIncomes().then((incomesunparsed) => {
+    userIncomes = incomesunparsed;
+
+    dateStart = new Date();
+    dateEnd = new Date();
+    dateStart.setHours(0,0,0,0);
+    dateEnd.setHours(23,59,59,59);
+    let todayIncomes = [];
+    todayIncomes = selectIncomesByDate(dateStart.toISOString(), dateEnd.toISOString());
+
+    let countProt = 0;
+    let countFat = 0;
+    let countCarbs = 0;
+    todayIncomes.forEach(income => {
+        countProt += parseFloat(income.protein);
+        countFat += parseFloat(income.fat);
+        countCarbs += parseFloat(income.carbs);
+    })
+    document.getElementById("todayProt").innerHTML = countProt + "g";
+    document.getElementById("todayFat").innerHTML = countFat + "g";
+    document.getElementById("todayCarbs").innerHTML = countCarbs + "g";
+    getGoals().then((goals) => {
+        if (goals == null) {
+            document.getElementById("todayProtPercent").innerHTML = "No goal"
+            document.getElementById("todayFatPercent").innerHTML = "No goal"
+            document.getElementById("todayCarbsPercent").innerHTML = "No  goal"
+        } else {
+            goal = JSON.parse(goals.json)
+            userGoals = goal;
+            document.getElementById("todayProtPercent").innerHTML = (countProt/goal.protein).toFixed(2)*100 + "%"
+            document.getElementById("todayFatPercent").innerHTML = (countFat/goal.fat).toFixed(2)*100 + "%"
+            document.getElementById("todayCarbsPercent").innerHTML = (countCarbs/goal.carbs).toFixed(2)*100 + "%"
+        }
+
+
+});
+
+});
+function selectIncomesByDate(dateStart, dateEnd) {
+    let res = [];
+    userIncomes.forEach(income => {
+        let realIncome = JSON.parse(income.json)
+        if ((realIncome.date >= dateStart) && (realIncome.date <= dateEnd)) {
+            res.push(realIncome);
+        }
+    })
+    return res;
+}
 
 /////////SOMEWHAT GOOD UPPER THAN THIS
 /////////SHIT UNDER THIS
@@ -159,20 +350,7 @@ async function createMeal() {
     await saveMeal(meal, date)
 }
 
-async function getMeals(dateStart, dateEnd) {
-    debugger;
-    const response = await fetch("/incomes?datestart=" + dateStart + "&dateend=" + dateEnd, {
-        method: "GET",
-    })
-    if (response.status === 200) {
-        return response.json();
-    }
-    else if (response.status === 204)
-        return [];
-    else {
-        document.getElementById("messagesWindow").innerHTML = response.status;
-    }
-}
+
 async function getResultByDate(date) {
     debugger;
     affixValue = parseInt(document.getElementById("hourBorder").value);
@@ -241,6 +419,9 @@ async function setDayDivisor(value) {
         document.getElementById("messagesWindow").innerHTML = response.status;
     }
 }
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
 async function getDesires() {
     const response = await fetch("/desires", {
         method: "GET",
@@ -283,11 +464,12 @@ async function deleteIngridient(id) {
     recountMeal();
 }
 async function newIngridient() {
-    protein = document.getElementById("proi").value
-    fat = document.getElementById("fati").value
-    carbs = document.getElementById("cari").value
-    quantity = document.getElementById("amni").value
-    title = document.getElementById("titi").value
+    debugger;
+    let protein = document.getElementById("proi").value
+    let fat = document.getElementById("fati").value
+    let carbs = document.getElementById("cari").value
+    let quantity = document.getElementById("amni").value
+    let title = document.getElementById("titi").value
     if(document.getElementById("selm").value == "gram") {
         type = 1;
         if (quantity == "") {quantity = 100}
@@ -323,7 +505,7 @@ async function addToPlate(protein, fat, carbs, title, id) {
                 <span> `+title+`:</span> 
                 
             </div>
-            <span>`+protein+`/`+fat+`/`+carbs+` - ` + (protein*4+fat*9+carbs*4)+`kkal</span> 
+            <span>`+protein+`/`+fat+`/`+carbs+` - ` + (protein*4+fat*9+carbs*4)+`kcsal</span>
         </div>
         <img class = "buttonImg", style = "width: 60px; height:60px" src = "assets/images/delete.png" onclick = "deleteFromPlate(` + id + `)">
     </div>`;
@@ -335,8 +517,12 @@ async function addToPlate(protein, fat, carbs, title, id) {
 
 function recountMeal() {
     result = getCraftedMeal();
-    document.getElementById("mealstat").innerHTML = result.totalProtein.toFixed(2) + "/" + result.totalFat.toFixed(2) + "/" + result.totalCarbs.toFixed(2);
-    document.getElementById("mealkkal").innerHTML = result.calories.toFixed(2) + "kkal";
+    prot =  result.protein.toFixed(2);
+    fat =  result.fat.toFixed(2);
+    carbs =  result.carbs.toFixed(2);
+    document.getElementById("mealstat").innerHTML =  prot + "/" + fat + "/" + carbs;
+    document.getElementById("mealkkal").innerHTML = prot*4+fat*9+carbs*4 + "kcal";
+    document.getElementById("mealprecent").innerHTML = ((prot/userGoals.protein)*100).toFixed(1) + "/" + ((fat/userGoals.fat)*100).toFixed(1) + "/" + ((carbs/userGoals.carbs)*100).toFixed(1) + "%"
 }
 checkAuth().then(() => {
 if (loggedIn) {
@@ -352,23 +538,7 @@ function changeMealType() {
     }
 
 }
-async function getPreferences(element) {
-    element.innerHTML = "";
-    const response = await fetch("/preferences", {
-        method: "GET",
-    });
-    if (response.status === 200) {
-        preferencies = await response.json();
-        preferencies.forEach(preference => {
-            const newOption = document.createElement("div")
-            newOption.innerHTML = preference.title + "<br>" + preference.protein + "-" + preference.fat + "-" + preference.carbs;
-            newOption.value = preference.id
-            newOption.setAttribute("onClick", "javascript: selectPreferenceOption('"+ preference.protein + "','" + preference.fat + "','" + preference.carbs + "','" + preference.title +"');" );
-            element.appendChild(newOption);
-        });
-    }
-    else throw response.status;
-}
+
 async function selectPreferenceOption(protein, fat, carbs, title) {
     debugger;
     document.getElementById("titleMealLine").value = title;
@@ -396,6 +566,25 @@ function select1(s) {
 }
 function unfocus1(s){
     document.getElementById(s).style.outline = "0";
+}
+function getPart() {
+    val1 = document.getElementById("parts1").value;
+    if (val1 = "") val1 = "1";
+    val2 = document.getElementById("parts2").value;
+    if (val2 = "") val2 = "1";
+    return val1/val2;
+}
+
+async function unfocusandclose(s, e){
+    //TODO: REDO THIS SHIT
+    await sleep(100);
+    document.getElementById(s).style.outline = "0";
+    document.getElementById(e).style.display = "none";
+}
+function focusandopen(s, e){
+    showPrefs(e);
+    document.getElementById(s).style.outline = "solid thin #000000";
+    document.getElementById(e).style.display = "flex";
 }
 function selectButton(obj) {
     if (document.getElementById(obj).dataset.selected == "1") {
@@ -436,6 +625,18 @@ function deleteFromPlate(id) {
     document.getElementById(id).remove();
     deleteIngridient(id);
 }
+async function deleteFavorites(id) {
+    document.getElementById("FAVBOX_" + id).remove();
+    const response = await fetch("/preferences/" + id, {
+            method: "DELETE",
+            headers: {
+                            'Content-Type': 'application/json'
+                        },
+        })
+    if (response.status === 200)
+            return;
+        throw response.status;
+}
 function addFav(protein, fat, carbs, title, id) {
     elem = document.createElement("div");
     elem.style = "border: solid 2px black; border-radius: 5px; margin-bottom: 10px;"
@@ -448,7 +649,7 @@ function addFav(protein, fat, carbs, title, id) {
                 <span> `+title+`:</span> 
                 
             </div>
-            <span>`+protein+`/`+fat+`/`+carbs+` - ` + (protein*4+fat*9+carbs*4)+`kkal</span> 
+            <span>`+protein+`/`+fat+`/`+carbs+` - ` + (protein*4+fat*9+carbs*4)+`kcal</span>
         </div>
         <img class = "buttonImg", style = "width: 60px; height:60px" src = "assets/images/delete.png" onclick = "deleteFromFav(FAV_` + title + `)">
     </div>`;

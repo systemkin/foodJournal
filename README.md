@@ -1,9 +1,6 @@
 # foodJournal
 # !Early Build!
 
-Strange design, non tested.
-Creating accounts and logging in likely tested
+Shitty front-end.
 
-Currently you can use main menu (i think?) but you can not check any results... only in db
-
-Full mess, cleaning will be later.
+Currently handles all default functionality over incomes and preferences

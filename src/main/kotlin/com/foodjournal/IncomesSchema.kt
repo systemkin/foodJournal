@@ -9,6 +9,7 @@ import org.jetbrains.exposed.sql.transactions.transaction
 
 @Serializable
 data class ExposedIncome(val id: Int, val login: String, val json: String)
+@Serializable
 data class InsertIncome(val login: String, val json: String)
 
 
@@ -41,6 +42,16 @@ class IncomesService(database: Database) {
                 .map { ExposedIncome(it[Incomes.id], it[Incomes.login], it[Incomes.json]) }
         }
     }
+    /*
+    suspend fun readByDateSpan(login: String, dateSpan: MyDateSpan): List<ExposedIncome> {
+        return dbQuery {
+            Incomes.selectAll()
+                .where { (Incomes.login eq login) and (dateSpan) }
+                .map { ExposedIncome(it[Incomes.id], it[Incomes.login], it[Incomes.json]) }
+        }
+    }
+
+    */
     //Mess
     suspend fun update(income: ExposedIncome) {
         dbQuery {

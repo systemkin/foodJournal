@@ -27,7 +27,10 @@ import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver
 
 @Serializable
 data class MyPassword(val pass: String)
+@Serializable
 data class MyJson(val json: String)
+@Serializable
+data class MyDateSpan(val dateStart: String, val dateEnd: String)
 
 fun Application.configureDatabases() {
     val database = Database.connect(
@@ -194,4 +197,39 @@ fun Application.configureDatabases() {
         }
     }
 
+
+    val goalsService = GoalsService(database)
+    routing {
+        authenticate("auth-session") {
+            get("/goals") {
+                val session = call.sessions.get<UserSession>()
+                if (session == null) {
+                    call.respondText("No active session", status = HttpStatusCode.Unauthorized)
+                } else {
+                    val login = session.login
+                    val goal = goalsService.read(login)
+                    if (goal == null) {
+                        call.respondText("No current goal", status = HttpStatusCode.NoContent)
+                    }else {
+                        call.respond(goal)
+                    }
+                }
+            }
+            delete("/goals") {
+                val session = call.sessions.get<UserSession>()
+                if (session == null) {
+                    call.respondText("No active session", status = HttpStatusCode.Unauthorized)
+                } else {
+                    val login = session.login
+                    goalsService.delete(login)
+                    call.respondText("Deleted successfully", status = HttpStatusCode.OK)
+                }
+            }
+        }
+
+    }
+
+
 }
+
+
