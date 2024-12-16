@@ -7,7 +7,7 @@
 	<body style="font-family: 'Lexend Deca'; display: flex; flex-direction: column; height: 100%;">
 		<div id = "header", class = "header">
 			<div id = "headerDivisorManager" class = "headerDivisorManager">
-				<div id = "helperButtonWrapper" class = "helperButtonWrapper" onclick="showMenu()">
+				<div id = "helperButtonWrapper" class = "helperButtonWrapper" onclick="forceClose();showMenu()">
 					<img class = "buttonImg", style = "width: 60px" src = "assets/images/menu.png">
 				</div>
 				<div id = "accountWrapper" class = "accountWrapper">
@@ -32,12 +32,12 @@
 								Title
 							</div>
 							<div class = "select long" id = "sl3">
-								<input id = titi  class = "select" onfocus="focusandopen('sl3', 'dropdownTitleDish')" onfocusout="unfocusandclose('sl3', 'dropdownTitleDish')" oninput = "showPrefs('dropdownTitleDish', 'titi')">
+								<input id = titi  class = "select" onclick="manageClick('titi', 'dropdownTitleDish')" oninput = "showPrefs('dropdownTitleDish', 'titi')">
 								<img class = "buttonImg small titleselect" src = "assets/images/subinput.png">
 							</div>
 						</div>
 						<div class = "dropdown" style ="display:flex; flex-direction: column; align-items: flex-end; margin-right: 50px">
-							<div id="dropdownTitleDish" class="dropdown-content" style = "display:none; flex-direction: column">
+							<div id="dropdownTitleDish" data-opened="0" class="dropdown-content" style = "display:none; flex-direction: column">
 							</div>
 						</div>
 						<div class = "horizontalFlexer textinput margined">
@@ -82,7 +82,7 @@
 								Add to favorites
 							</div>
 							
-							<button id="favI"class = "checkmark" data-selected="0" onclick="selectButton('favI')">
+							<button id="favI"class = "checkmark" data-selected="0" onclick="forceClose(); selectButton('favI')">
 							</button>
 						</div>
 						<center>
@@ -111,14 +111,14 @@
 							Title
 						</div>
 						<div class = "select long" id = "sl2">
-							<input id = "titlePlate"  class = "select" onfocus="focusandopen('sl2', 'dropdownTitleDish2')" onfocusout="unfocusandclose('sl2', 'dropdownTitleDish2')" oninput = "showPrefs('dropdownTitleDish2', 'titlePlate')">
+							<input id = "titlePlate"  class = "select"  onclick="manageClick('titlePlate', 'dropdownTitleDish2', 'notNull')" oninput = "showPrefs('dropdownTitleDish2', 'titlePlate', 'notNull')">
 
 
 							<img class = "buttonImg small titleselect" src = "assets/images/subinput.png">
 						</div>
 					</div>
 					<div class = "dropdown" style ="display:flex; flex-direction: column; align-items: flex-end; margin-right: 50px">
-						<div id="dropdownTitleDish2" class="dropdown-content" style = "display:none; flex-direction: column">
+						<div id="dropdownTitleDish2" data-opened="0" class="dropdown-content" style = "display:none; flex-direction: column">
 						</div>
 					</div>
 					<div class = "horizontalFlexer flexed">
@@ -137,7 +137,7 @@
 							Add to favorites
 						</div>
 						
-						<button id="favD"class = "checkmark" data-selected="0" onclick="selectButton('favD')">
+						<button id="favD"class = "checkmark" data-selected="0" onclick="forceClose();selectButton('favD')">
 						</button>
 					</div>
 					<center>
@@ -208,12 +208,12 @@
 									Title
 								</div>
 								<div class = "select long" id = "sl1">
-									<input id = "plateTitle2" class = "select" onfocus="focusandopen('sl1', 'dropdownTitleDish3')" onfocusout="unfocusandclose('sl1', 'dropdownTitleDish3')" oninput = "showPrefs('dropdownTitleDish3', 'plateTitle2')">
+									<input id = "plateTitle2" class = "select" onclick="manageClick('plateTitle2', 'dropdownTitleDish3', 'notNull')" oninput = "showPrefs('dropdownTitleDish3', 'plateTitle2, 'notNull')">
 									<img class = "buttonImg small titleselect" src = "assets/images/subinput.png">
 								</div>
 							</div>
 							<div class = "dropdown" style ="display:flex; flex-direction: column; align-items: flex-end; margin-right: 50px">
-								<div id="dropdownTitleDish3" class="dropdown-content" style = "display:none; flex-direction: column">
+								<div id="dropdownTitleDish3" data-opened="0" class="dropdown-content" style = "display:none; flex-direction: column">
 								</div>
 							</div>
 							<div class = "realDiv"></div>
@@ -224,7 +224,7 @@
 								<div class = "marginedText black">
 									Add to favorites
 								</div>
-								<button id="favP"class = "checkmark" data-selected="0" onclick="selectButton('favP')">
+								<button id="favP"class = "checkmark" data-selected="0" onclick="forceClose();selectButton('favP')">
 								</button>
 							</div>
 							<div class = "realDiv"></div>
@@ -287,13 +287,8 @@
 
 
 		<div id = "account", class = "mainWindow" style = "display:none">
-			<input id = "usernameRegisterLine" placeholder = "Login">
-			<input id = "passwordRegisterLine" placeholder = "Password">
-			<button onclick = "register()">Зарегистрироваться</button>
-			<input id="usernameLoginLine">
-			<input id="passwordLoginLine">
-			<button onclick = "login()">Логин</button>
-			<button onclick = "logoff()">Выйти</button>
+
+			<div class = "button"  onclick = "logoff()">Выйти</div>
 		</div>
 		<div id = "info", class = "mainWindow" style = "display:none">
 			We need better design,
@@ -308,7 +303,92 @@
 		</div>
 
 		<div id ="goals" class = "mainWindow" style = "display:none">
+			<div class = "subBlock">
+				<div class = "verticalFlexer spaceBetween center">
+					<div class = "title">
+						Goals
+					</div>
+					<div class = "horizontalFlexer textinput margined">
+						<div class = "marginedText black padded">
+							Your goals:
+						</div>
+						<div class = "marginedText black padded" id = "goalsDiv">
+							No current goal
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class = "subBlock">
+				<div class = "realDiv"></div><div class = "realDiv"></div>
+					<div class = "title">
+						Recount goals (Miffin St Geor)
+					</div>
+					<div class = "horizontalFlexer textinput margined">
+						<div class = "marginedText black padded">
+							Age (years)
+						</div>
+						<input id = "age" class = "int", placeholder = "18", type = "number" >
+					</div>
+					<div class = "horizontalFlexer textinput margined">
+							<div class = "marginedText black padded">
+								Height (cm)
+							</div>
+							<input id = "height" class = "int", placeholder = "175", type = "number" >
+					</div>
+					<div class = "horizontalFlexer textinput margined">
+						<div class = "marginedText black padded">
+							Mass (kg)
+						</div>
+						<input id = "mass" class = "int", placeholder = "70", type = "number" >
+					</div>
+					<div class = "horizontalFlexer textinput margined">
+						<div class = "marginedText black padded">
+							Sex
+						</div>
+						<select name="sex" id="sex">
+							<option value="male">Male</option>
+							<option value="female">Female</option>
+						</select>
+					</div>
+					<div class = "horizontalFlexer textinput margined">
+						<div class = "marginedText black padded">
+							Want to
+						</div>
+						<select name="desire" id="desire">
+							<option value="gain">Gain weight</option>
+							<option value="keep">Keep weight</option>
+							<option value="lose">Lose weight</option>
+						</select>
+					</div>
+					<div class = "horizontalFlexer textinput margined">
+						<div class = "marginedText black padded">
+							Activity level
+						</div>
+						<select name="activity" id="activity">
+							<option value="1.2">Minimum</option>
+							<option value="1.4">Small</option>
+							<option value="1.5">Moderate</option>
+							<option value="1.7">Hard</option>
+							<option value="1.9">Extreme</option>
+						</select>
+					</div>
+					<div class = "button" onclick = "recountGoals()">
+						Recount goals
+					</div>
+					</div>
+			<div class = "subBlock">
+				<div class = "marginedText black padded">
+					<br>	– Minimum: None or almost no physique trainings, sitting work<div class="realDiv"></div>
+					<br>	– Small: Active exercises 1-3 times a week for about 20-40 minutes or active walking till day<div class="realDiv"></div>
+					<br>	– Moderate: Intense training 30-60 minutes 3-4 times a week<div class="realDiv"></div>
+					<br>	– Hard: Heavy work or active sport 5-7 times a week<div class="realDiv"></div>
+					<br>	– Extreme: More than 7 trainings a week or extremely hard work<div class="realDiv"></div>
 
+				</div>
+			</div>
+				</div>
+
+			</div>
 		</div>
 		<div id ="settings" class = "mainWindow" style = "display:none">
 

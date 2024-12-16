@@ -42,6 +42,15 @@ class IncomesService(database: Database) {
                 .map { ExposedIncome(it[Incomes.id], it[Incomes.login], it[Incomes.json]) }
         }
     }
+    suspend fun readPaged(login: String, page: Int, pageSize: Int): List<ExposedIncome> {
+        return dbQuery {
+            var offset = (page - 1) * pageSize
+            Incomes.selectAll()
+                .where { Incomes.login eq login }
+                .limit(pageSize).offset(offset.toLong())
+                .map { ExposedIncome(it[Incomes.id], it[Incomes.login], it[Incomes.json]) }
+        }
+    }
     /*
     suspend fun readByDateSpan(login: String, dateSpan: MyDateSpan): List<ExposedIncome> {
         return dbQuery {

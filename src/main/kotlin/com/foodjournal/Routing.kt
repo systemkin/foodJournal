@@ -42,6 +42,16 @@ fun Application.configureRouting() {
     }
 
     routing {
+        authenticate("auth-session") {
+            get("/auth") {
+                val session = call.sessions.get<UserSession>()
+                if (session == null) {
+                    call.respondText("No active session", status = HttpStatusCode.Unauthorized)
+                } else {
+                    call.respondText(session.login)
+                }
+            }
+        }
         staticResources("/static", "static")
 
         //Login to app

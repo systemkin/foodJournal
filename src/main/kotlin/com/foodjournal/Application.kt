@@ -23,7 +23,7 @@ fun Application.module() {
 
             }
             challenge {
-                call.respondRedirect("/login")
+                call.respondRedirect("/static/login.html")
             }
 
         }

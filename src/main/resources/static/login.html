@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Журнал питания</title>
+    <link rel="stylesheet" href="assets/css/index.css" />
+    <link rel="icon" type="image/x-icon" href="assets/images/favicon.ico">
+</head>
+<body style="font-family: 'Lexend Deca'; display: flex; flex-direction: column; height: 100%;">
+    <center>
+        FoodJournal. Please login.
+    </center>
+    <div class = "subBlock" style = "height: 300px; display:flex; flex-direction:column; align-items: center; justify-content: space-evenly">
+        <input class = "select2" id = "usernameRegisterLine" placeholder = "Login">
+        <input class = "select2" id = "passwordRegisterLine" placeholder = "Password">
+        <center>
+            <div class = "button"  onclick = "register()" style ="padding: 5px 10px 5px 10px">Register</div>
+        </center>
+        </div>
+        <div class = "subBlock" style = "height: 300px; display:flex; flex-direction:column; align-items: center; justify-content: space-evenly">
+        <input class = "select2"  id="usernameLoginLine" placeholder = "Login">
+        <input class = "select2"  id="passwordLoginLine" placeholder = "Password">
+        <center>
+            <div class = "button" onclick = "login()" style ="padding: 5px 10px 5px 10px">Login</div>
+        </center>
+            </div>
+
+    </div>
+    <div id = "msg">
+
+    </div>
+    <script src="assets/js/login.js"></script>
+</body>
+
+</html>
