@@ -33,8 +33,8 @@ async function login() {
     })
     if (response.status === 200) {
         window.location.href = "/static/index.html";
-    } else if (status == 401)
-                   document.getElementById("msg").innerHTML = "Wrong password";
+    } else if (response.status == 401)
+                   document.getElementById("msg").innerHTML = "Wrong login and/or a password";
     else {
         document.getElementById("messagesWindow").innerHTML = response.status;
     }
@@ -64,11 +64,8 @@ async function registerSuccessful(login) {
     })
     if (response.status === 200) {
         window.location.href = "/static/index.html";
-    } else if (status == 401)
-                   document.getElementById("msg").innerHTML = "Wrong password";
-    else {
-        document.getElementById("messagesWindow").innerHTML = response.status;
-    }
+    } else if (response.status == 401)
+                   document.getElementById("msg").innerHTML = "Wrong login and/or a password";
     window.location.href = "/static/index.html";
 }
 function registerFailed(login, status) {

@@ -50,9 +50,7 @@ fun Application.configureSecurity() {
     }
 }
 
-//TODO: Rewrite (Why use Service.Users if like service is for abstracting from it. Also what a hell)
-//Global UserService?
-//Or keep it as it is is good approach?
+
 fun authenticate(login: String, pass: String): Boolean {
     return transaction {
         UserService.Users.selectAll()
