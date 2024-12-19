@@ -19,6 +19,7 @@ repositories {
 }
 
 dependencies {
+    testImplementation(kotlin("test"))
     implementation("org.mindrot:jbcrypt:0.4")
     implementation("io.ktor:ktor-server-resources:<ktor_version>")
     implementation(libs.ktor.server.core)
@@ -40,7 +41,23 @@ dependencies {
     implementation(libs.logback.classic)
     implementation(libs.ktor.server.config.yaml)
     implementation("com.mysql:mysql-connector-j:9.1.0")
+    implementation(libs.ktor.server.test.host)
+    implementation(libs.kotlin.test.junit)
     testImplementation(libs.ktor.server.test.host)
+    testImplementation("io.ktor:ktor-server-test-host")
+    testImplementation("org.jetbrains.kotlin:kotlin-test")
     testImplementation(libs.kotlin.test.junit)
-
+    implementation("org.jetbrains.kotlin", "kotlin-test-junit", "1.9.10")
+    implementation("io.ktor", "ktor-server-tests", "2.3.11")
+    testImplementation("io.ktor", "ktor-server-tests", "2.3.11")
+    testImplementation("org.jetbrains.kotlin", "kotlin-test-junit", "1.9.10")
+    implementation(kotlin("test"))
+    implementation("io.ktor", "ktor-server-core", "2.3.11")
+    implementation("io.ktor", "ktor-server-netty", "2.3.11")
+    implementation("io.ktor", "ktor-serialization-jackson", "2.3.11")
+    implementation("io.ktor:ktor-server-core:2.x.x")
+    implementation("io.ktor:ktor-server-netty:2.x.x")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.x.x")
+    implementation("io.ktor:ktor-server-tests:2.x.x")
+    implementation("org.jetbrains.kotlin:kotlin-test:1.x.x")
 }

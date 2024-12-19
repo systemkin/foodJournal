@@ -2,6 +2,7 @@ package com.foodjournal
 
 import com.codahale.metrics.*
 import io.ktor.http.*
+import io.ktor.http.ContentDisposition.Companion.File
 import io.ktor.resources.*
 import io.ktor.resources.Resources
 import io.ktor.serialization.gson.*
@@ -31,13 +32,14 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import org.mindrot.jbcrypt.BCrypt;
 import io.ktor.server.resources.*
 import io.ktor.server.routing.*
+import java.io.File
 
 fun Application.configureRouting() {
     install(io.ktor.server.resources.Resources)
 
     install(StatusPages) {
         exception<Throwable> { call, cause ->
-            call.respondText(text = "500: $cause" , status = HttpStatusCode.InternalServerError)
+            call.respondText(text = "500" , status = HttpStatusCode.InternalServerError) //$cause
         }
     }
 
@@ -51,8 +53,10 @@ fun Application.configureRouting() {
                     call.respondText(session.login)
                 }
             }
+
         }
         staticResources("/static", "static")
+
 
         //Login to app
         post("/login") {

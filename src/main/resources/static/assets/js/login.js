@@ -24,6 +24,7 @@ async function login() {
     let password = document.getElementById("passwordLoginLine").value;
     const response = await fetch("/login", {
         method: "POST",
+        mode: 'no-cors',
         headers: {
             'Content-Type': 'application/json'
         },
