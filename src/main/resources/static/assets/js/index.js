@@ -4,11 +4,12 @@ let craftingMeal = []
 let menuState = false;
 let userIncomes = [];
 let userGoals = {protein:-1, fat:-1, carbs:-1};
-
+let theme = "TANK";
 modalWindows = ["account", "mainWindow", "menu", "plate", "favorites", "results", "goals", "ai"];
 let lastIngid = 0;
 let fav_id = 0
-
+let x = document.cookie;
+if (getCookie("teme") == "NONTANK") changeTheme();
 
 async function sendRegisterRequest(login, password) {
     const response = await fetch("/accounts", {
@@ -245,7 +246,7 @@ function rebuildFavs() {
          <div style='display:flex; flex-direction: row; justify-content: space-between; padding-right: 10px;'>
           <span> `+preference.title+`:</span>
         </div>
-       <span>`+preference.protein+`/`+preference.fat+`/`+preference.carbs+` - ` + (preference.protein*4+preference.fat*9+preference.carbs*4)+`kcal</span>
+       <span>`+parseFloat(preference.protein).toFixed(1)+`/`+ parseFloat(preference.fat).toFixed(1)+`/`+ parseFloat(preference.carbs).toFixed(1)+` - ` + (preference.protein*4+preference.fat*9+preference.carbs*4).toFixed(1)+`kcal</span>
       </div>
       <img class = "buttonImg", style = "width: 60px; height:60px" src = "assets/images/delete.png" onclick = "deleteFavorites('` + pref.id + `')">
     </div>`;
@@ -287,7 +288,7 @@ function showPrefs(elemento, sorter, target) {
             elem.className = "dropdownElement";
             elem.style ="border: solid 1px black; width:100%"
             let kcal =  (pref.protein*4+pref.fat*9+pref.carbs*4).toFixed(2);
-            elem.innerHTML = pref.title + ": " + pref.protein + "/" + pref.fat + "/" + pref.carbs + "<br>" + kcal + "kcal";
+            elem.innerHTML = pref.title + ": " + parseFloat(pref.protein).toFixed(1) + "/" + parseFloat(pref.fat).toFixed(1) + "/" + parseFloat(pref.carbs).toFixed(1) + "<br>" + kcal + "kcal";
             if (target != null)
                 elem.setAttribute( "onClick", "craftingMeal = []; selectPlatePreference('"+ JSON.stringify(pref) +"'); manageClick('null', '"+ elemento + "', 'notnull')" );
             else elem.setAttribute( "onClick", "selectDishPreference('"+ JSON.stringify(pref) +"');manageClick('null', '"+ elemento + "', 'null')" );
@@ -307,7 +308,7 @@ function showPrefs(elemento, sorter, target) {
             pref.protein = "" + pref.protein;
             pref.fat = "" + pref.fat;
             pref.carbs = "" + pref.carbs;
-            elem.innerHTML = pref.title + ": " + pref.protein + "/" + pref.fat + "/" + pref.carbs + "<br>" + kcal + "kcal";
+            elem.innerHTML = pref.title + ": " + parseFloat(pref.protein).toFixed(1) + "/" + parseFloat(pref.fat).toFixed(1) + "/" + parseFloat(pref.carbs).toFixed(1) + "<br>" + kcal + "kcal";
             if (target != null)
                 elem.setAttribute( "onClick", "craftingMeal = []; selectPlatePreference('"+ JSON.stringify(pref) +"'); manageClick('null', '"+ elemento + "', 'notnull')" );
             else elem.setAttribute( "onClick", "selectDishPreference('"+ JSON.stringify(pref) +"');manageClick('null', '"+ elemento + "', 'null')" );
@@ -623,7 +624,7 @@ async function generate() {
     const response =  await fetch("https://api.ai21.com/studio/v1/chat/completions", {
     	method: "POST",
     	headers: {
-    		"Authorization": "Bearer TOKEN",
+    		"Authorization": "Bearer Hzcd0ZnTn7QvMBGaxw0v8wLQ7nb1nICF",
     		"Content-Type": "application/json",
     	},
     	body: JSON.stringify({
@@ -631,7 +632,7 @@ async function generate() {
     		"messages": [
     		{
     			"role": "user",
-    			"content": "You are a marketing expert with great writing skills. Can you take this email draft and improve it?\n\nI want it to look professional and be engaging and fun. This will be sent to our user-base mailing list\n\n&nbsp;\n\nSubject: New languages in Socialll\n\n&nbsp;\n\nHi there,\n\n&nbsp;\n\nI just wanted to let you know that we added some new languages to Socialll. Now it supports German, Swedish, and Korean. We worked hard on this, so I hope you find it useful.\n\n&nbsp;\n\nIf you have users who speak those languages, they can now use our tool in their native language. It should make things easier for them. I think that's it. Let me know if there are any problems.",
+    			"content": "Make a short (20-25 words) encouragement message about keeping the food plan and after that remind about recount macronutrient goals after weight change",
     		}],
     		"documents":[],
     		"tools":[],
@@ -647,11 +648,11 @@ async function generate() {
     return json;
 
 }
-/*
+
 generate().then((res) => {
-    console.log(res);
+    document.getElementById("motivationalMessage").innerHTML = res.choices[0].message.content;
 })
-*/
+
 /////////SOMEWHAT GOOD UPPER THAN THIS
 /////////SHIT UNDER THIS
 
@@ -668,7 +669,51 @@ async function createMeal() {
     await saveMeal(meal, date)
 }
 
+async function changeTheme() {
+    if (theme == "TANK") {
+        var oldlink = document.getElementsByTagName("link").item(0);
+        document.cookie = "teme=NONTANK; path=/";
+        document.getElementById("themeimg").src = "assets/images/Hank.png";
+        var newlink = document.createElement("link");
+        newlink.setAttribute("rel", "stylesheet");
+        newlink.setAttribute("type", "text/css");
+        newlink.setAttribute("href", "/static/assets/css/Berry.css");
+        document.getElementsByTagName("head").item(0).appendChild(newlink);
+        document.getElementsByTagName("head").item(0).removeChild(oldlink);
+        //document.getElementsByTagName("head").item(0).replaceChild(newlink, oldlink);
+        theme = "NON TANK";
+    } else {
+        document.cookie = "teme=TANK; path=/";
+        var oldlink = document.getElementsByTagName("link").item(0);
+        document.getElementById("themeimg").src = "assets/images/Berry.png";
 
+        var newlink = document.createElement("link");
+        newlink.setAttribute("rel", "stylesheet");
+        newlink.setAttribute("type", "text/css");
+        newlink.setAttribute("href", "/static/assets/css/index.css");
+        document.getElementsByTagName("head").item(0).appendChild(newlink);
+                document.getElementsByTagName("head").item(0).removeChild(oldlink);
+        theme = "TANK";
+    }
+}
+debugger;
+
+
+function getCookie(cname) {
+  let name = cname + "=";
+  let decodedCookie = decodeURIComponent(document.cookie);
+  let ca = decodedCookie.split(';');
+  for(let i = 0; i <ca.length; i++) {
+    let c = ca[i];
+    while (c.charAt(0) == ' ') {
+      c = c.substring(1);
+    }
+    if (c.indexOf(name) == 0) {
+      return c.substring(name.length, c.length);
+    }
+  }
+  return "";
+}
 async function getResultByDate(date) {
     
     affixValue = parseInt(document.getElementById("hourBorder").value);

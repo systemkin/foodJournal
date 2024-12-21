@@ -293,7 +293,6 @@ div.menu {
     background-color: #D9D9D9;
 }
 div.menuOption {
-    background-color: 1px solid black;
     margin-top: 5px;
     box-sizing: border-box;
     padding-right: 20px !important;

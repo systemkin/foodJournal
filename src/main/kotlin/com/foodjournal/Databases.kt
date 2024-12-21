@@ -47,14 +47,19 @@ fun Application.configureDatabases() {
         //Create account
         post("/accounts") {
             val user = call.receive<ExposedUser>()
-            try {
-                userService.create(user);
-            } catch (e: org.jetbrains.exposed.exceptions.ExposedSQLException) {
-                call.respondText("User already exists", status = HttpStatusCode.Conflict)
-            }
+            if ((user.login.length > 20) or (user.login.length <= 3)) {
+                call.respondText("Login must be from 4 to 20 characters", status = HttpStatusCode.BadRequest)
+            } else if (user.pass.length <= 5) {
+                call.respondText("Password must be larger than 5 characters", status = HttpStatusCode.BadRequest)
+            } else {
+                try {
+                    userService.create(user);
+                } catch (e: org.jetbrains.exposed.exceptions.ExposedSQLException) {
+                    call.respondText("User already exists", status = HttpStatusCode.Conflict)
+                }
                 call.respondText("User created", status = HttpStatusCode.OK)
+            }
         }
-
 
         authenticate("auth-session") {
                 //Change password

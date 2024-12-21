@@ -5,7 +5,7 @@
 
 body {
     margin: 0px;
-    background-color: #BECBFF;
+    background-color: #ffc8d4;
     font-size: 50px;
 }
 div.mainWindow {
@@ -16,7 +16,7 @@ div.mainWindow {
     flex:1;
 }
 div.header {
-    background-color: #5751eb;  
+    background-color: #d81b60;
     height: 90px;
     min-height: 90px;
     width: 100vw;
@@ -57,10 +57,10 @@ div.marginedText {
     margin-left: 10px;
     margin-right: 10px;
     font-size: 50px;
-    color: #D9D9D9;
+    color: #e8dada;
 }
 div.marginedText.blue {
-    color: #0700D7
+    color: #d81b60;
 }
 div.marginedText.black {
     color: #000000
@@ -84,7 +84,7 @@ div.subBlock {
     height: max-content;
     padding: 10px;
     padding-top: 5px;
-    background-color: #D9D9D9;
+    background-color: #e8dada;
     border: 2px solid #000000;
     box-sizing: border-box;
 }
@@ -136,9 +136,9 @@ div.horizontalFlexer.textinput.margined {
 div.button {
     margin-top: 20px;
     text-align: center;
-    background-color: #94AAFF;
+    background-color: #ffccbc;
     font-size: 50px;
-    color: #0700D7;
+    color: #d81b60;
     border-radius: 15px;
     border: 2px solid #5651EA;
     width: 90%;
@@ -150,11 +150,11 @@ div.button {
 }
 div.button:hover {
     background-color: #acbcfc;
-    color: #0700D7;
+    color: #d81b60;
     transition: color 0.3s;
 }
 div.select {
-    background-color: #D9D9D9;
+    background-color: #e8dada;
     font-family: "Lexend Deca";
     border: solid 1px #000000;
     border-radius: 7px;
@@ -180,7 +180,7 @@ input.select {
     height: 100%;
     width: 100%;
     font-size: 50px;
-    background-color: #D9D9D9;
+    background-color: #e8dada;
     font-family: "Lexend Deca";
     border: solid 0px;
     border-radius: 7px;
@@ -191,7 +191,7 @@ input.select {
 }
 input.select2 {
     font-size: 50px;
-    background-color: #D9D9D9;
+    background-color: #e8dada;
     font-family: "Lexend Deca";
     border: solid 0px;
     border-radius: 7px;
@@ -211,7 +211,7 @@ button.checkmark {
     height: 60px;
     width: 60px;
     padding: 0px;
-    background-color: #D9D9D9;
+    background-color: #e8dada;
 }
 button.checkmark:hover {
     outline: auto;
@@ -238,7 +238,7 @@ div.realDiv {
     width: 10px;
 }
 select {
-    background-color: #D9D9D9;
+    background-color: #e8dada;
     font-family: "Lexend Deca";
     height: fit-content;
     font-size: 50px;
@@ -256,7 +256,7 @@ input.int {
     height: 70px;
     width: 50%;
     font-size: 50px;
-    background-color: #D9D9D9;
+    background-color: #e8dada;
     font-family: "Lexend Deca";
     border: solid 0px;
     border-radius: 7px;
@@ -280,8 +280,8 @@ div.title {
     text-align: center;
     margin: 10px;
     font-size: 50px;
-    color: #D9D9D9;
-    color: #0700D7
+    color: #e8dada;
+    color: #d81b60;
 }
 div.menu {
     position: fixed;
@@ -290,17 +290,17 @@ div.menu {
     left: 0px;
     width: 100%;
     height: 100%;
-    background-color: #D9D9D9;
+    background-color: #e8dada;
 }
 div.menuOption {
-    background-color: 1px solid black;
+    border: 1px solid black;
     margin-top: 5px;
     box-sizing: border-box;
     padding-right: 20px !important;
     text-align: end;
     align-content: center;
     width: 100%;
-    background-color:#94AAFF;
+    background-color:#ffccbc;
     height: 100px;
 }
 div.menuOption:hover {

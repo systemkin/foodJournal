@@ -11,20 +11,27 @@ async function sendRegisterRequest(login, password) {
     });
     if (response.status === 200)
         return;
-    throw response.status;
+    throw response;
 
 }
+let theme = "TANK";
+let x = document.cookie;
+if (getCookie("teme") == "NONTANK") changeTheme();
 function register() {
     let login = document.getElementById("usernameRegisterLine").value;
     let password = document.getElementById("passwordRegisterLine").value;
-    sendRegisterRequest(login, password).then(() => registerSuccessful(login), (status) => registerFailed(login, status));
+        if (password != document.getElementById("passwordRegisterLine2").value) {
+            document.getElementById("msg").innerHTML = "Passwords does not match";
+            return;
+        }
+    sendRegisterRequest(login, password).then(() => registerSuccessful(login), (response) => registerFailed(login, response));
 }
 async function login() {
     let username = document.getElementById("usernameLoginLine").value;
     let password = document.getElementById("passwordLoginLine").value;
+
     const response = await fetch("/login", {
         method: "POST",
-        mode: 'no-cors',
         headers: {
             'Content-Type': 'application/json'
         },
@@ -36,8 +43,8 @@ async function login() {
         window.location.href = "/static/index.html";
     } else if (response.status == 401)
                    document.getElementById("msg").innerHTML = "Wrong login and/or a password";
-    else {
-        document.getElementById("messagesWindow").innerHTML = response.status;
+    else if (response.status == 400){
+        document.getElementById("msg").innerHTML = "Login is too long  (max - 20 characters)";
     }
 }
 async function logoff() {
@@ -69,9 +76,13 @@ async function registerSuccessful(login) {
                    document.getElementById("msg").innerHTML = "Wrong login and/or a password";
     window.location.href = "/static/index.html";
 }
-function registerFailed(login, status) {
-    if (status == 409)
+function registerFailed(login, resp) {
+    if (resp.status == 409)
         document.getElementById("msg").innerHTML = "User already exists. Try another login";
+    else if (resp.status == 400){
+           resp.text().then((value) => { document.getElementById("msg").innerHTML = value;
+           })
+        }
 }
 async function checkAuth() {
     const response = await fetch("/auth", {
@@ -84,3 +95,50 @@ async function checkAuth() {
     }
 }
 checkAuth();
+
+async function changeTheme() {
+    if (theme == "TANK") {
+        var oldlink = document.getElementsByTagName("link").item(0);
+        document.cookie = "teme=NONTANK; path=/";
+        document.getElementById("themeimg").src = "assets/images/Hank.png";
+        var newlink = document.createElement("link");
+        newlink.setAttribute("rel", "stylesheet");
+        newlink.setAttribute("type", "text/css");
+        newlink.setAttribute("href", "/static/assets/css/Berry.css");
+        document.getElementsByTagName("head").item(0).appendChild(newlink);
+        document.getElementsByTagName("head").item(0).removeChild(oldlink);
+        //document.getElementsByTagName("head").item(0).replaceChild(newlink, oldlink);
+        theme = "NON TANK";
+    } else {
+        debugger;
+        document.cookie = "teme=TANK; path=/";
+        let x = document.cookie;
+        var oldlink = document.getElementsByTagName("link").item(0);
+        document.getElementById("themeimg").src = "assets/images/Berry.png";
+
+        var newlink = document.createElement("link");
+        newlink.setAttribute("rel", "stylesheet");
+        newlink.setAttribute("type", "text/css");
+        newlink.setAttribute("href", "/static/assets/css/index.css");
+        document.getElementsByTagName("head").item(0).appendChild(newlink);
+                document.getElementsByTagName("head").item(0).removeChild(oldlink);
+        theme = "TANK";
+    }
+}
+
+
+function getCookie(cname) {
+  let name = cname + "=";
+  let decodedCookie = decodeURIComponent(document.cookie);
+  let ca = decodedCookie.split(';');
+  for(let i = 0; i <ca.length; i++) {
+    let c = ca[i];
+    while (c.charAt(0) == ' ') {
+      c = c.substring(1);
+    }
+    if (c.indexOf(name) == 0) {
+      return c.substring(name.length, c.length);
+    }
+  }
+  return "";
+}
