@@ -60,4 +60,5 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter:5.x.x")
     implementation("io.ktor:ktor-server-tests:2.x.x")
     implementation("org.jetbrains.kotlin:kotlin-test:1.x.x")
+    implementation("io.ktor:ktor-client-content-negotiation:3.0.2")
 }

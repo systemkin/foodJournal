@@ -1,17 +1,13 @@
-package com.foodjournal
+package com.foodjournal.models
 
-import com.foodjournal.IncomesService.Incomes
 import kotlinx.coroutines.Dispatchers
-import kotlinx.serialization.Serializable
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import org.jetbrains.exposed.sql.transactions.transaction
+import com.foodjournal.views.*
 
 
-@Serializable
-data class ExposedPreference(val id: Int, val login: String, val json: String)
-data class InsertPreference(val login: String, val json: String)
 
 class PreferencesService(database: Database) {
     object Preferences : Table() {
@@ -42,7 +38,14 @@ class PreferencesService(database: Database) {
                 .map { ExposedPreference(it[Preferences.id], it[Preferences.login], it[Preferences.json]) }
         }
     }
-
+    suspend fun readById(id: Int): ExposedPreference? {
+        return dbQuery {
+            Preferences.selectAll()
+                .where { Preferences.id eq id }
+                .map { ExposedPreference(it[Preferences.id], it[Preferences.login], it[Preferences.json]) }
+                .singleOrNull()
+        }
+    }
     suspend fun update(preference: ExposedPreference) {
         dbQuery {
             Preferences.update({ (Preferences.id eq preference.id) and (Preferences.login eq preference.login)}) {

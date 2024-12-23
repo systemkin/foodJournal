@@ -1,16 +1,12 @@
-package com.foodjournal
+package com.foodjournal.models
 
 import kotlinx.coroutines.Dispatchers
-import kotlinx.serialization.Serializable
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import org.jetbrains.exposed.sql.transactions.transaction
+import com.foodjournal.views.*
 
-@Serializable
-data class ExposedIncome(val id: Int, val login: String, val json: String)
-@Serializable
-data class InsertIncome(val login: String, val json: String)
 
 
 class IncomesService(database: Database) {
@@ -40,6 +36,14 @@ class IncomesService(database: Database) {
             Incomes.selectAll()
                 .where { Incomes.login eq login }
                 .map { ExposedIncome(it[Incomes.id], it[Incomes.login], it[Incomes.json]) }
+        }
+    }
+    suspend fun readById(id: Int): ExposedIncome? {
+        return dbQuery {
+            Incomes.selectAll()
+                .where { Incomes.id eq id }
+                .map { ExposedIncome(it[Incomes.id], it[Incomes.login], it[Incomes.json]) }
+                .singleOrNull()
         }
     }
     suspend fun readPaged(login: String, page: Int, pageSize: Int): List<ExposedIncome> {

@@ -1,36 +1,18 @@
-package com.foodjournal
+package com.foodjournal.controllers
 
-import com.codahale.metrics.*
+import com.foodjournal.models.GoalsService
+import com.foodjournal.models.IncomesService
+import com.foodjournal.models.PreferencesService
+import com.foodjournal.models.UserService
 import io.ktor.http.*
-import io.ktor.resources.*
-import io.ktor.serialization.gson.*
-import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
-import io.ktor.server.http.content.*
-import io.ktor.server.metrics.dropwizard.*
-import io.ktor.server.plugins.contentnegotiation.*
-import io.ktor.server.plugins.cors.routing.*
-import io.ktor.server.plugins.csrf.*
-import io.ktor.server.plugins.statuspages.*
 import io.ktor.server.request.*
-import io.ktor.server.resources.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.sessions.*
-import io.ktor.server.thymeleaf.Thymeleaf
-import io.ktor.server.thymeleaf.ThymeleafContent
-import java.util.concurrent.TimeUnit
-import kotlinx.serialization.Serializable
 import org.jetbrains.exposed.sql.*
-import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver
-
-@Serializable
-data class MyPassword(val pass: String)
-@Serializable
-data class MyJson(val json: String)
-@Serializable
-data class MyDateSpan(val dateStart: String, val dateEnd: String)
+import com.foodjournal.views.*
 
 fun Application.configureDatabases() {
     val database = Database.connect(
@@ -46,11 +28,13 @@ fun Application.configureDatabases() {
     routing {
         //Create account
         post("/accounts") {
+            println("Received user")
             val user = call.receive<ExposedUser>()
+            println("Received user: $user")
             if ((user.login.length > 20) or (user.login.length <= 3)) {
-                call.respondText("Login must be from 4 to 20 characters", status = HttpStatusCode.BadRequest)
+                call.respondText("Login must be from 4 to 20 characters", status = HttpStatusCode.ExpectationFailed)
             } else if (user.pass.length <= 5) {
-                call.respondText("Password must be larger than 5 characters", status = HttpStatusCode.BadRequest)
+                call.respondText("Password must be larger than 5 characters", status = HttpStatusCode.ExpectationFailed)
             } else {
                 try {
                     userService.create(user);

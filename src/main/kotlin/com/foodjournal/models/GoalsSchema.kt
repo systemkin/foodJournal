@@ -1,16 +1,12 @@
-package com.foodjournal
+package com.foodjournal.models
 
 import kotlinx.coroutines.Dispatchers
-import kotlinx.serialization.Serializable
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import org.jetbrains.exposed.sql.transactions.transaction
+import com.foodjournal.views.*
 
-@Serializable
-data class ExposedGoal(val login: String, val json: String)
-@Serializable
-data class InsertGoal(val login: String, val json: String)
 
 class GoalsService(database: Database) {
     object Goals : Table() {
@@ -36,7 +32,7 @@ class GoalsService(database: Database) {
     suspend fun read(login: String): ExposedGoal? {
         return dbQuery {
             Goals.selectAll()
-                .where {Goals.login eq login }
+                .where { Goals.login eq login }
                 .map { ExposedGoal(it[Goals.login], it[Goals.json]) }
                 .singleOrNull() // Return a single goal or null if not found
         }
