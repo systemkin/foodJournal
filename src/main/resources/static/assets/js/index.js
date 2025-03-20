@@ -82,7 +82,7 @@ async function postMeal(meal) {
             json: mealString
         })
     })
-    
+
     userIncomes.push({id:parseInt(await response.text()), login:document.getElementById("usernameSign").innerHTML, json: mealString})
 }
 async function saveMeal() {
@@ -107,7 +107,7 @@ async function saveMeal() {
     if (meal.carbs == "") {
         meal.carbs = "0";
     };
-    
+
     let quantity = document.getElementById("amni").value
 
     if(document.getElementById("selm").value == "gram") {
@@ -275,7 +275,7 @@ async function getGoals() {
 
 
 function showPrefs(elemento, sorter, target) {
-    
+
     element = document.getElementById(elemento);
     element.innerHTML = "";
     let prefType = "";
@@ -318,7 +318,7 @@ function showPrefs(elemento, sorter, target) {
     element.style = "display: flex;";
 }
 function selectDishPreference(string) {
-    
+
     dish = JSON.parse(string);
     if (dish.type == "gram") {
         document.getElementById("selm").value = "gram";
@@ -332,7 +332,7 @@ function selectDishPreference(string) {
 }
 
 function selectPlatePreference(string) {
-    
+
     document.getElementById("plateBox").innerHTML = "";
 
     dish = JSON.parse(string);
@@ -397,7 +397,7 @@ function countGoals() {
 
 function goalsM() {
     getIncomes().then((incomesunparsed) => {
-    
+
         userIncomes = incomesunparsed;
 
         dateStart = new Date();
@@ -468,7 +468,7 @@ function goalsM() {
         getGoals().then((goals) => rebuildGoals(goals));
 
         function rebuildGoals(goals) {
-            
+
                 if (goals == null) {
                     document.getElementById("todayProtPercent").innerHTML = "No goal"
                     document.getElementById("todayFatPercent").innerHTML = "No goal"
@@ -538,7 +538,7 @@ async function addToDatev2(protein, fat, carbs, title, id) {
 
 
 function dateSelected() {
-    
+
     document.getElementById("dateBox").innerHTML = "";
     let date = document.getElementById("resultDate").value;
     todayDate = new Date();
@@ -649,10 +649,21 @@ async function generate() {
 
 }
 
-generate().then((res) => {
-    document.getElementById("motivationalMessage").innerHTML = res.choices[0].message.content;
+generate2().then((res) => {
+    document.getElementById("motivationalMessage").innerHTML = JSON.parse(res).choices[0].message.content;
 })
 
+async function generate2() { const response = await fetch("/encourage", {
+                                   method: "GET",
+                               })
+
+                               if (response.status === 200) {
+                                   return await response.text();
+                               } else {
+                                   window.location.href = "/static/login.html";
+
+                               }
+}
 /////////SOMEWHAT GOOD UPPER THAN THIS
 /////////SHIT UNDER THIS
 
@@ -696,7 +707,6 @@ async function changeTheme() {
         theme = "TANK";
     }
 }
-debugger;
 
 
 function getCookie(cname) {
@@ -715,7 +725,7 @@ function getCookie(cname) {
   return "";
 }
 async function getResultByDate(date) {
-    
+
     affixValue = parseInt(document.getElementById("hourBorder").value);
     //2024-03-04
     let dateStart = new Date(date);
@@ -728,12 +738,12 @@ async function getResultByDate(date) {
 }
 
 async function todayResult() {
-    
+
     today = new Date();
     affixValue = parseInt(document.getElementById("hourBorder").value);
     if (today.getHours() < affixValue)
         today.setDate(today.getDate()-1);
-    
+
     let month = String(today.getMonth() + 1);
     if (month.length == 1) {
         month = "0" + month;
@@ -743,7 +753,7 @@ async function todayResult() {
         date = "0" + date;
     }
     dateToday = today.getFullYear() + "-" + month + "-" + date;
-    
+
 
 
     getResultByDate(dateToday)
@@ -765,7 +775,7 @@ async function getDayDivisor() {
     const response = await fetch("/daydivisors", {
         method: "GET",
     })
-    if (response.status === 200) {
+    if (response.status === 200) {z
         return (await response.json()).daydivisor;
     }
     else {
@@ -842,7 +852,7 @@ async function deleteIncome(id) {
         }
 }
 async function newIngridient() {
-    
+
     let protein = document.getElementById("proi").value;
     if (protein == "") protein = "0";
 
@@ -895,17 +905,17 @@ async function addToPlate(protein, fat, carbs, title, id) {
     <div style='display:flex; flex-direction: row; justify-content: space-between; padding-top:10px; padding-right:10px'>
         <div style='display:flex; flex-direction: column; padding: 20px 30px 20px 30pxж'>
             <div style='display:flex; flex-direction: row; justify-content: space-between; padding-right: 10px;'>
-                <span> `+title+`:</span> 
-                
+                <span> `+title+`:</span>
+
             </div>
             <span>`+protein+`/`+fat+`/`+carbs+` - ` + (protein*4+fat*9+carbs*4)+`kcal</span>
         </div>
         <img class = "buttonImg", style = "width: 60px; height:60px" src = "assets/images/delete.png" onclick = "deleteFromPlate(` + id + `)">
     </div>`;
     document.getElementById("plateBox").appendChild(elem);
-    
-    
-    
+
+
+
 }
 
 function recountMeal() {
@@ -929,7 +939,7 @@ function changeMealType() {
 }
 
 async function selectPreferenceOption(protein, fat, carbs, title) {
-    
+
     document.getElementById("titleMealLine").value = title;
     document.getElementById("proteinMealLine").value = protein;
     document.getElementById("fatMealLine").value = fat;
@@ -981,7 +991,7 @@ function focusandopen(s, e, type){
 }
 
 function manageClick(s, e, type) {
-    
+
     let elem = document.getElementById(e);
     if (elem.dataset.opened == "1") {
         unfocusandclose(s, e, type);
@@ -1031,9 +1041,9 @@ function changedMeasurement() {
     }
 }
 function closeExcept(openWindow) {
-    modalWindows.forEach(window => { 
+    modalWindows.forEach(window => {
         if (window != openWindow)
-            document.getElementById(window).style.display = "none"; 
+            document.getElementById(window).style.display = "none";
         else document.getElementById(window).style.display = "flex";
     }
     );
@@ -1066,7 +1076,7 @@ async function deleteFavorites(id) {
 }
 async function getMotivationalMessage() {
     var url = "https://api.ai21.com/studio/v1/chat/completions";
-    var bearer = 'Bearer ' + "Hzcd0ZnTn7QvMBGaxw0v8wLQ7nb1nICF";
+    var bearer = 'Bearer ' + "AAAAAAAAAASOBADtokenAAAAAAAAAAAA";
     fetch(url, {
             method: 'POST',
             withCredentials: true,
@@ -1093,8 +1103,8 @@ function addFav(protein, fat, carbs, title, id) {
     <div style='display:flex; flex-direction: row; justify-content: space-between; padding-top:10px; padding-right:10px'>
         <div style='display:flex; flex-direction: column; padding: 20px 30px 20px 30pxж'>
             <div style='display:flex; flex-direction: row; justify-content: space-between; padding-right: 10px;'>
-                <span> `+title+`:</span> 
-                
+                <span> `+title+`:</span>
+
             </div>
             <span>`+protein+`/`+fat+`/`+carbs+` - ` + (protein*4+fat*9+carbs*4)+`kcal</span>
         </div>

@@ -30,7 +30,9 @@ fun Application.configureRouting() {
                     call.respondText(session.login)
                 }
             }
-
+            get("/encourage") {
+                call.respondText(generateResponse())
+            }
         }
         staticResources("/static", "static")
 
