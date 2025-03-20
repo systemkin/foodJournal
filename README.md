@@ -1,6 +1,6 @@
 # foodJournal
-# !Early Build!
+# Uni project
 
-Shitty front-end.
+Databases.kt = database config
+MySQL + JRE required
 
-Currently handles all default functionality over incomes and preferences
