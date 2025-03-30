@@ -1,6 +1,7 @@
 # foodJournal
 # Uni project
 
-Databases.kt = database config
+config.toml = database config
 MySQL + JRE required
 
+./gradlew build + ./gradlew run
