@@ -16,7 +16,6 @@ fun Application.configureDatabases() {
     val tomlString = Paths.get("config.toml").readText()
     val dbdata = Toml.decodeFromString(dbdata.serializer(), tomlString)
     val jdbcUrl = "${dbdata.dbname}?user=${dbdata.user}&password=${dbdata.password}"
-    println("Full JDBC URL: $jdbcUrl")
     val database = Database.connect(
         url = dbdata.dbname,
         user = dbdata.user,
