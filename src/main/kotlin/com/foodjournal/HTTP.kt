@@ -1,4 +1,4 @@
-package com.foodjournal.serving
+package com.foodjournal
 
 import io.ktor.http.*
 import io.ktor.server.application.*
@@ -13,6 +13,6 @@ fun Application.configureHTTP() {
         allowMethod(HttpMethod.Patch)
         allowHeader(HttpHeaders.Authorization)
 
-        anyHost() // @TODO: Don't do this in production if possible. Try to limit it.
+        anyHost()
     }
 }

@@ -1,20 +1,13 @@
 package com.foodjournal
 
-import com.foodjournal.models.GoalsService
-import com.foodjournal.models.IncomesService
-import com.foodjournal.models.PreferencesService
-import com.foodjournal.security.hashPassword
-import com.foodjournal.security.verifyPassword
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
-import io.ktor.server.application.*
 import io.ktor.server.testing.*
 import kotlin.test.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.serialization.kotlinx.json.*
 import org.jetbrains.exposed.sql.Database
-import com.foodjournal.views.*
 
 class ApplicationTest {
     @Test

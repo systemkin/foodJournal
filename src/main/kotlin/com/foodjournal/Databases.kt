@@ -1,9 +1,5 @@
-package com.foodjournal.controllers
+package com.foodjournal
 
-import com.foodjournal.models.GoalsService
-import com.foodjournal.models.IncomesService
-import com.foodjournal.models.PreferencesService
-import com.foodjournal.models.UserService
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
@@ -12,14 +8,20 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.sessions.*
 import org.jetbrains.exposed.sql.*
-import com.foodjournal.views.*
+import java.nio.file.Paths
+import kotlin.io.path.readText
+import net.peanuuutz.tomlkt.Toml
 
 fun Application.configureDatabases() {
+    val tomlString = Paths.get("config.toml").readText()
+    val dbdata = Toml.decodeFromString(dbdata.serializer(), tomlString)
+    val jdbcUrl = "${dbdata.dbname}?user=${dbdata.user}&password=${dbdata.password}"
+    println("Full JDBC URL: $jdbcUrl")
     val database = Database.connect(
-        url = "jdbc:mysql://localhost:3306/auth",
-        user = "root",
-        driver = "com.mysql.cj.jdbc.Driver",
-        password = "mysql",
+        url = dbdata.dbname,
+        user = dbdata.user,
+        driver = dbdata.driver,
+        password = dbdata.password,
     )
     /*User management
         /accounts                           <--- PUT/POST/DELETE ||| Change Password / Create Account / Delete Account

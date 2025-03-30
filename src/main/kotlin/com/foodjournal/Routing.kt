@@ -1,4 +1,4 @@
-package com.foodjournal.serving
+package com.foodjournal
 
 import io.ktor.http.*
 import io.ktor.server.application.*
@@ -9,7 +9,7 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.auth.*
 import io.ktor.server.sessions.*
-import com.foodjournal.views.*
+import com.foodjournal.*
 
 fun Application.configureRouting() {
     install(io.ktor.server.resources.Resources)
@@ -30,9 +30,6 @@ fun Application.configureRouting() {
                     call.respondText(session.login)
                 }
             }
-            get("/encourage") {
-                call.respondText(generateResponse())
-            }
         }
         staticResources("/static", "static")
 
@@ -40,7 +37,7 @@ fun Application.configureRouting() {
         //Login to app
         post("/login") {
             val user = call.receive<ExposedUser>()
-            if (com.foodjournal.security.authenticate(user.login, user.pass)) {
+            if (com.foodjournal.authenticate(user.login, user.pass)) {
                 call.sessions.set(UserSession(user.login, user.pass))
                 val login = user.login
                 call.respondText("Logged in as $login")

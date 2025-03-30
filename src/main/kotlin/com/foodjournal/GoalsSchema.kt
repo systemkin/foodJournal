@@ -1,11 +1,10 @@
-package com.foodjournal.models
+package com.foodjournal
 
 import kotlinx.coroutines.Dispatchers
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import org.jetbrains.exposed.sql.transactions.transaction
-import com.foodjournal.views.*
 
 
 class GoalsService(database: Database) {

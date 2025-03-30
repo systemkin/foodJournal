@@ -1,4 +1,4 @@
-package com.foodjournal.views
+package com.foodjournal
 
 import kotlinx.serialization.Serializable
 
@@ -24,3 +24,5 @@ data class MyPassword(val pass: String)
 data class MyJson(val json: String)
 @Serializable
 data class MyDateSpan(val dateStart: String, val dateEnd: String)
+@Serializable
+data class dbdata(val driver: String, val dbname: String, val user: String, val password: String)

@@ -1,4 +1,4 @@
-package com.foodjournal.security
+package com.foodjournal
 
 import com.codahale.metrics.*
 import io.ktor.server.application.*

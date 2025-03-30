@@ -1,4 +1,4 @@
-package com.foodjournal.serving
+package com.foodjournal
 
 import io.ktor.server.application.*
 import io.ktor.server.thymeleaf.Thymeleaf

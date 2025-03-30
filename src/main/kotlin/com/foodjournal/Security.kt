@@ -1,16 +1,29 @@
-package com.foodjournal.security
-import com.foodjournal.models.UserService
+package com.foodjournal
 import io.ktor.server.application.*
+import io.ktor.server.auth.*
 import io.ktor.server.plugins.csrf.*
+import io.ktor.server.response.*
 import org.jetbrains.exposed.sql.*
 import io.ktor.server.sessions.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.mindrot.jbcrypt.BCrypt
 
-import com.foodjournal.views.*
-
 fun Application.configureSecurity() {
+    install(Authentication) {
+        session<UserSession>("auth-session") {
+            validate { session ->
+                if (authenticate(session.login, session.pass)) {
+                    session
+                } else {
+                    null
+                }
+            }
+            challenge {
+                call.respondRedirect("/static/login.html")
+            }
 
+        }
+    }
     install(CSRF) {
         // tests Origin is an expected value
         allowOrigin("http://localhost:8080")

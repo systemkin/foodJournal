@@ -17,6 +17,13 @@ application {
 repositories {
     mavenCentral()
 }
+/*
+tasks.test {
+    testLogging {
+        showStandardStreams = true
+    }
+}
+*/
 
 dependencies {
     testImplementation(kotlin("test"))
@@ -61,4 +68,5 @@ dependencies {
     implementation("io.ktor:ktor-server-tests:2.x.x")
     implementation("org.jetbrains.kotlin:kotlin-test:1.x.x")
     implementation("io.ktor:ktor-client-content-negotiation:3.0.2")
+    implementation("net.peanuuutz.tomlkt:tomlkt:0.4.0")
 }
