@@ -24,7 +24,18 @@ tasks.test {
     }
 }
 */
-
+sourceSets {
+    test {
+        resources {
+            srcDirs("src/test/resources")
+        }
+    }
+}
+tasks {
+    withType<Copy> {
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    }
+}
 dependencies {
     testImplementation(kotlin("test"))
     implementation("org.mindrot:jbcrypt:0.4")

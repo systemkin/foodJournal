@@ -8,17 +8,31 @@ import kotlin.test.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.serialization.kotlinx.json.*
 import org.jetbrains.exposed.sql.Database
+import io.ktor.server.config.*
+import io.ktor.server.config.yaml.*
+
+
 
 class ApplicationTest {
     @Test
+    fun verifyConfig() {
+        val resource = javaClass.classLoader.getResource("application-test.yaml")
+        assertNotNull(resource)
+    }
+
+    @Test
     fun unloginTest() = testApplication {
+        environment {
+            config = ApplicationConfig("application-test.yaml")
+        }
         application {
             module()
         }
+
         val client = createClient {
-            install(ContentNegotiation) {
+            /*install(ContentNegotiation) {
                 json()
-            }
+            }*/
         }
         val response = client.delete("/login") {
             header(HttpHeaders.Origin, "http://localhost:8080")
@@ -29,6 +43,9 @@ class ApplicationTest {
 
     @Test
     fun testStaticFiles1() = testApplication {
+        environment {
+            config = ApplicationConfig("application-test.yaml")
+        }
         application {
             module()
         }
@@ -37,6 +54,9 @@ class ApplicationTest {
     }
     @Test
     fun testStaticFiles2() = testApplication {
+        environment {
+            config = ApplicationConfig("application-test.yaml")
+        }
         application {
             module()
         }
@@ -45,6 +65,9 @@ class ApplicationTest {
     }
     @Test
     fun testStaticFiles3() = testApplication {
+        environment {
+            config = ApplicationConfig("application-test.yaml")
+        }
         application {
             module()
         }
@@ -53,6 +76,9 @@ class ApplicationTest {
     }
     @Test
     fun testStaticFiles4() = testApplication {
+        environment {
+            config = ApplicationConfig("application-test.yaml")
+        }
         application {
             module()
         }
@@ -61,6 +87,9 @@ class ApplicationTest {
     }
     @Test
     fun testStaticFiles5() = testApplication {
+        environment {
+            config = ApplicationConfig("application-test.yaml")
+        }
         application {
             module()
         }
@@ -69,6 +98,9 @@ class ApplicationTest {
     }
     @Test
     fun testStaticFiles6() = testApplication {
+        environment {
+            config = ApplicationConfig("application-test.yaml")
+        }
         application {
             module()
         }
@@ -86,6 +118,9 @@ class ApplicationTest {
     /*
     @Test
     */fun testRegistration() = testApplication {
+        environment {
+            config = ApplicationConfig("application-test.yaml")
+        }
         application {
             module()
         }
@@ -108,6 +143,9 @@ class ApplicationTest {
 
     @Test
     fun testRegistration2() = testApplication {
+        environment {
+            config = ApplicationConfig("application-test.yaml")
+        }
         application {
             module()
         }
@@ -129,6 +167,9 @@ class ApplicationTest {
     }
     @Test
     fun testLogin1() = testApplication {
+        environment {
+            config = ApplicationConfig("application-test.yaml")
+        }
         application {
             module()
         }
@@ -148,6 +189,9 @@ class ApplicationTest {
     }
     @Test
     fun testLogin2() = testApplication {
+        environment {
+            config = ApplicationConfig("application-test.yaml")
+        }
         application {
             module()
         }

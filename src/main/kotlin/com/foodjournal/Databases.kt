@@ -7,14 +7,27 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.sessions.*
+import kotlinx.serialization.Serializable
 import org.jetbrains.exposed.sql.*
 import java.nio.file.Paths
 import kotlin.io.path.readText
 import net.peanuuutz.tomlkt.Toml
 
+
+data class dbdata(val dbname: String, val user: String, val password: String, val driver: String)
+fun Application.getDdatabaseConfig(): dbdata {
+    return dbdata(
+        environment.config.property("ktor.database.dbname").getString(),
+        environment.config.property("ktor.database.user").getString(),
+        environment.config.property("ktor.database.password").getString(),
+        environment.config.property("ktor.database.driver").getString(),
+    )
+
+}
+
 fun Application.configureDatabases() {
     val tomlString = Paths.get("config.toml").readText()
-    val dbdata = Toml.decodeFromString(dbdata.serializer(), tomlString)
+    val dbdata = getDdatabaseConfig();
     val jdbcUrl = "${dbdata.dbname}?user=${dbdata.user}&password=${dbdata.password}"
     val database = Database.connect(
         url = dbdata.dbname,
