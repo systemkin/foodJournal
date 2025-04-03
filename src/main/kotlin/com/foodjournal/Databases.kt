@@ -7,11 +7,9 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.sessions.*
-import kotlinx.serialization.Serializable
 import org.jetbrains.exposed.sql.*
 import java.nio.file.Paths
 import kotlin.io.path.readText
-import net.peanuuutz.tomlkt.Toml
 
 
 data class dbdata(val dbname: String, val user: String, val password: String, val driver: String)

@@ -10,8 +10,12 @@ import io.ktor.server.routing.*
 import io.ktor.server.auth.*
 import io.ktor.server.sessions.*
 import com.foodjournal.*
-
+import io.ktor.server.auth.jwt.*
+import com.auth0.jwt.JWT
+import com.auth0.jwt.algorithms.Algorithm
+import java.util.*
 fun Application.configureRouting() {
+    val secret = getSecret();
     install(io.ktor.server.resources.Resources)
 
     install(StatusPages) {
@@ -50,6 +54,28 @@ fun Application.configureRouting() {
         delete("/login") {
             call.sessions.clear<UserSession>()
             call.respondText("Logged out successfully", status = HttpStatusCode.OK)
+        }
+
+
+        post("/restore-password-request") {
+            val userEmail = call.receive<MyEmail>()
+            val token = JWT.create()
+                .withAudience("foodJournal-client-password-restorer")
+                .withIssuer("foodJournal-server")
+                .withClaim("email", userEmail.email)
+                .withExpiresAt(Date(System.currentTimeMillis() + 3_600_000)) // 1 hour
+                .sign(Algorithm.HMAC256(secret));
+            //TODO: send link to email
+            call.respondText("link sent to Email, if one registered", status = HttpStatusCode.OK)}
+
+        authenticate("restore-password") {
+            post("/restore-password") {
+                val userEmail = call.receive<MyPassword>()
+                val principal = call.principal<JWTPrincipal>()
+                val email= principal!!.payload.getClaim("email")?.asString()
+                //TODO: remake password
+                call.respondText("Password changed", status = HttpStatusCode.OK)}
+            }
         }
     }
 }
