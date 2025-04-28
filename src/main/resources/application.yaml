@@ -9,4 +9,9 @@ ktor:
         user: "root"
         password: "mysql"
         driver: "com.mysql.cj.jdbc.Driver"
+    fooddb:
+        path: "mongodb://localhost:27017"
+        dbname: "foods"
+    security:
+        secret: "dev-secret"
     

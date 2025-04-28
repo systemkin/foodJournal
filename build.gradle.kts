@@ -36,6 +36,10 @@ tasks {
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     }
 }
+tasks.withType<JavaCompile> {
+    sourceCompatibility = "23"
+    targetCompatibility = "23"
+}
 val ktor_version = "3.1.2"
 dependencies {
     testImplementation(kotlin("test"))
@@ -82,5 +86,9 @@ dependencies {
     implementation("io.ktor:ktor-client-content-negotiation:3.0.2")
     implementation("io.ktor:ktor-server-auth:$ktor_version")
     implementation("io.ktor:ktor-server-auth-jwt:$ktor_version")
+    implementation("io.ktor:ktor-server-core:$ktor_version")
+    implementation("io.insert-koin:koin-ktor:3.5.0")
+    implementation("io.insert-koin:koin-logger-slf4j:3.5.0")
+    implementation("org.litote.kmongo:kmongo-coroutine:5.2.1")
     implementation("io.ktor:ktor-server-core:$ktor_version")
 }

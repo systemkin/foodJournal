@@ -115,9 +115,9 @@ class ApplicationTest {
     fun testHashing2() = testApplication {
         assertEquals(true, verifyPassword("HASHING", hashPassword("HASHING")))
     }
-    /*
+
     @Test
-    */fun testRegistration() = testApplication {
+    fun testRegistration() = testApplication {
         environment {
             config = ApplicationConfig("application-test.yaml")
         }

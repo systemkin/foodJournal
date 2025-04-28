@@ -1,8 +1,14 @@
 .gradle
+.kotlin/
 build/
+data/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
+
+### Security ###
+client_secret*.json
+
 
 ### STS ###
 .apt_generated

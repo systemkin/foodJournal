@@ -11,6 +11,7 @@ class UserService(database: Database) {
     object Users : Table() {
         val login = varchar("login", length = 128).uniqueIndex()
         val pass = varchar("pass", length = 128)
+        val email = varchar("email", length = 128)
 
         override val primaryKey = PrimaryKey(login)
     }
@@ -25,6 +26,7 @@ class UserService(database: Database) {
         Users.insert {
             it[pass] = hashPassword(user.pass)
             it[login] = user.login
+            it[email] = user.email
         }
     }
 
@@ -32,7 +34,7 @@ class UserService(database: Database) {
         return dbQuery {
             Users.selectAll()
                 .where { Users.login eq login }
-                .map { ExposedUser(it[Users.login], it[Users.pass]) }
+                .map { ExposedUser(it[Users.login], it[Users.pass], it[Users.email]) }
                 .singleOrNull()
         }
     }
@@ -41,6 +43,7 @@ class UserService(database: Database) {
         dbQuery {
             Users.update({ Users.login eq user.login }) {
                 it[pass] = hashPassword(user.pass)
+                it[email] = user.email
             }
         }
     }

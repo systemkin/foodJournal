@@ -1,4 +1,0 @@
-dbname = "jdbc:mysql://localhost:3306/auth"
-user = "root"
-password = "mysql"
-driver = "com.mysql.cj.jdbc.Driver"
