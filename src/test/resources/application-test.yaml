@@ -2,7 +2,7 @@ ktor:
     deployment:
         port: 8080
     database:
-        dbname: "jdbc:mysql://localhost:3306/foodjournal-test"
+        dbname: "jdbc:mysql://localhost:3306/auth"
         user: "root"
         password: "mysql"
         driver: "com.mysql.cj.jdbc.Driver"

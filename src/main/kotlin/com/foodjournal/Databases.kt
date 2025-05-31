@@ -15,10 +15,26 @@ import org.koin.ktor.plugin.Koin
 import org.koin.dsl.module
 import org.litote.kmongo.coroutine.coroutine
 import org.litote.kmongo.reactivestreams.KMongo
+import org.litote.kmongo.coroutine.CoroutineClient
+import org.litote.kmongo.coroutine.CoroutineDatabase
+import org.litote.kmongo.Id
+import org.litote.kmongo.newId
+import org.bson.Document
+import org.bson.types.ObjectId
+
 
 data class ExposedUser(val login: String, val pass: String, val email: String)
 data class dbdata(val dburl: String, val user: String, val password: String, val driver: String)
 data class foddDbData(val path: String, val dbname: String)
+data class Food(
+    val id: String = ObjectId().toString(),
+    val description: String,
+    val foodNutrients: Document = Document(),
+    val nutrientConversionFactors: Document = Document(),
+    val foodCategory: Document = Document()
+)
+
+
 
 fun Application.getMainDatabaseInfo(): dbdata {
     return dbdata(
@@ -38,9 +54,11 @@ fun Application.configureDatabases() {
     val applicationModule = { dbdata: dbdata ->
         module {
             val foodDbData = getFoodDatabaseInfo()
-            val client = KMongo.createClient(foodDbData.path).coroutine
-            val fooddb = client.getDatabase(foodDbData.dbname)
+            val client: CoroutineClient = KMongo.createClient(foodDbData.path).coroutine
+            val database: CoroutineDatabase = client.getDatabase(foodDbData.dbname)
+            val foods = database.getCollection<Food>("foods")
 
+            single { foods }
 
             val db = Database.connect(
                 url = dbdata.dburl,

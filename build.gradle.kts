@@ -91,4 +91,5 @@ dependencies {
     implementation("io.insert-koin:koin-logger-slf4j:3.5.0")
     implementation("org.litote.kmongo:kmongo-coroutine:5.2.1")
     implementation("io.ktor:ktor-server-core:$ktor_version")
+    implementation("org.litote.kmongo:kmongo-coroutine:4.11.0")
 }
