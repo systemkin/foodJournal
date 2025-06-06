@@ -25,7 +25,7 @@ fun Application.module() {
     configureTemplating()
     configureMonitoring()
     configureHTTP()
-    configureRouting() //TODO: REFACTOR
+    configureRouting()
 }
 
 

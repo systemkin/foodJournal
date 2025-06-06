@@ -21,58 +21,48 @@ import org.litote.kmongo.Id
 import org.litote.kmongo.newId
 import org.bson.Document
 import org.bson.types.ObjectId
+import com.mongodb.client.model.Indexes
+import com.mongodb.kotlin.client.coroutine.MongoClient
+import com.mongodb.kotlin.client.coroutine.MongoDatabase
 
-
-data class ExposedUser(val login: String, val pass: String, val email: String)
 data class dbdata(val dburl: String, val user: String, val password: String, val driver: String)
 data class foddDbData(val path: String, val dbname: String)
-data class Food(
-    val id: String = ObjectId().toString(),
+data class food(
+    val id: ObjectId = ObjectId(),
     val description: String,
     val foodNutrients: Document = Document(),
     val nutrientConversionFactors: Document = Document(),
     val foodCategory: Document = Document()
 )
+data class user(
+    val id: ObjectId = ObjectId(),
+    val externalAuth: Document = Document(),
+    val dailyGoals: Document = Document()
+)
+data class meal(
+    val id: ObjectId = ObjectId(),
+    val isStarred: Boolean,
+    val time: String,
+    val ingredients: Document = Document(),
+    val owner: ObjectId
+)
 
-
-
-fun Application.getMainDatabaseInfo(): dbdata {
-    return dbdata(
-        environment.config.property("ktor.database.dbname").getString(),
-        environment.config.property("ktor.database.user").getString(),
-        environment.config.property("ktor.database.password").getString(),
-        environment.config.property("ktor.database.driver").getString(),
-    )
-}
-fun Application.getFoodDatabaseInfo(): foddDbData {
+fun Application.getDbInfo(): foddDbData {
     return foddDbData(
         environment.config.property("ktor.fooddb.path").getString(),
         environment.config.property("ktor.fooddb.dbname").getString(),
     )
 }
 fun Application.configureDatabases() {
-    val applicationModule = { dbdata: dbdata ->
-        module {
-            val foodDbData = getFoodDatabaseInfo()
-            val client: CoroutineClient = KMongo.createClient(foodDbData.path).coroutine
-            val database: CoroutineDatabase = client.getDatabase(foodDbData.dbname)
-            val foods = database.getCollection<Food>("foods")
-
-            single { foods }
-
-            val db = Database.connect(
-                url = dbdata.dburl,
-                user = dbdata.user,
-                driver = dbdata.driver,
-                password = dbdata.password
-            )
-            single { UserService(db) }
-            single { IncomesService(db) }
-            single { PreferencesService(db) }
-            single { GoalsService(db) }
-        }
-    }
     install(Koin) {
-        modules(applicationModule(getMainDatabaseInfo()))
+        modules(module {
+            val dbData = getDbInfo()
+
+            val client = MongoClient.create(dbData.path)
+            val database: MongoDatabase = client.getDatabase(dbData.dbname)
+
+            single { MealsRepository(database) }
+
+        }, securityModule)
     }
 }

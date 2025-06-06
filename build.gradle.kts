@@ -91,5 +91,7 @@ dependencies {
     implementation("io.insert-koin:koin-logger-slf4j:3.5.0")
     implementation("org.litote.kmongo:kmongo-coroutine:5.2.1")
     implementation("io.ktor:ktor-server-core:$ktor_version")
-    implementation("org.litote.kmongo:kmongo-coroutine:4.11.0")
+    implementation("org.mongodb:mongodb-driver-kotlin-coroutine:4.11.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
+    implementation("com.google.api-client:google-api-client:2.0.0")
 }
