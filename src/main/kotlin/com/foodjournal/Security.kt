@@ -10,32 +10,64 @@ import org.jetbrains.exposed.sql.*
 import org.koin.dsl.module
 import org.koin.ktor.ext.inject
 import org.koin.ktor.plugin.Koin
-import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
-import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload;
-import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
-import com.google.api.client.http.javanet.NetHttpTransport
-import com.google.api.client.json.gson.GsonFactory
 
-val securityModule = module {
-    val transport = NetHttpTransport()
-    val jsonFactory = GsonFactory.getDefaultInstance()
+import io.ktor.server.routing.*
+import org.bson.types.ObjectId
+import kotlinx.serialization.Serializable
+import io.ktor.client.HttpClient
+import io.ktor.serialization.kotlinx.json.*
+import io.ktor.client.plugins.contentnegotiation.*
+import io.ktor.server.application.*
+import kotlinx.serialization.json.Json
+import javax.crypto.Cipher
+import javax.crypto.spec.IvParameterSpec
+import javax.crypto.spec.SecretKeySpec
+import java.util.Base64
+import java.security.SecureRandom
 
-    single {
+class TokenEncryptor(private val secret: String) {
+    private val algorithm = "AES/CBC/PKCS5Padding"
 
-        GoogleIdTokenVerifier.Builder(transport, jsonFactory)
-            .setAudience(listOf(getGoogleClientId()))
-            .build()
+    fun encrypt(plaintext: String): EncryptedData {
+        val ivBytes = ByteArray(16)
+        SecureRandom().nextBytes(ivBytes)
+        val iv = IvParameterSpec(ivBytes)
+        val keySpec = SecretKeySpec(secret.toByteArray(Charsets.UTF_8), "AES")
+
+        val cipher = Cipher.getInstance(algorithm).apply {
+            init(Cipher.ENCRYPT_MODE, keySpec, iv)
+        }
+
+        val ciphertext = cipher.doFinal(plaintext.toByteArray())
+
+        return EncryptedData(
+            iv = Base64.getEncoder().encodeToString(ivBytes),
+            ciphertext = Base64.getEncoder().encodeToString(ciphertext)
+        )
+    }
+
+    fun decrypt(encrypted: EncryptedData): String {
+        val iv = IvParameterSpec(Base64.getDecoder().decode(encrypted.iv))
+        val keySpec = SecretKeySpec(secret.toByteArray(Charsets.UTF_8), "AES")
+
+        val cipher = Cipher.getInstance(algorithm).apply {
+            init(Cipher.DECRYPT_MODE, keySpec, iv)
+        }
+
+        return String(cipher.doFinal(Base64.getDecoder().decode(encrypted.ciphertext)))
     }
 }
 
-fun Application.getSecret(): String {
-    return environment.config.property("ktor.security.secret").getString();
-}
-fun Application.getGoogleClientId(): String {
-    return environment.config.property("ktor.security.google-client-id").getString();
-}
+@Serializable
+data class EncryptedData(val iv: String, val ciphertext: String)
+
+
+
+@Serializable
+data class UserSession(val id: String)
+
+
 fun Application.configureSecurity() {
-    val secret = getSecret(); // seems messy
     install(CSRF) {
         // tests Origin is an expected value
         allowOrigin("http://localhost:8080")
@@ -45,33 +77,80 @@ fun Application.configureSecurity() {
 
     }
     install(Sessions) {
+
         cookie<UserSession>("user_session") {
             cookie.path = "/"
             cookie.maxAgeInSeconds = 60*60*24*30
+            transform(
+                SessionTransportTransformerEncrypt(
+                    System.getenv("SESSION_ENCRYPTION_SECRET").toByteArray(),
+                    System.getenv("SESSION_SIGN_SECRET").toByteArray(),
+                    backwardCompatibleRead = true
+                )
+            )
         }
     }
-
-
-}
-fun Application.verifyGoogleId(id: String): Boolean {
-    val verifier by inject<GoogleIdTokenVerifier>()
-    val idToken: GoogleIdToken? = verifier.verify(id)
-    if (idToken != null) {
-        val payload: Payload = idToken.getPayload()
-
-        val userId: String = payload.getSubject()
-        //println("User ID: " + userId)
-
-        val email: String = payload.getEmail()
-        val emailVerified: Boolean = java.lang.Boolean.valueOf(payload.getEmailVerified())
-        //val name: String = payload.get("name")
-        //val pictureUrl: String = payload.get("picture")
-        //val locale: String = payload.get("locale")
-        //val familyName: String = payload.get("family_name")
-        //val givenName: String = payload.get("given_name")
-        return true;
-
-    } else {
-        return false;
+    val redirects by inject<MutableMap<String, String>>()
+    val HttpClient by inject<HttpClient>()
+    val usersRepository by inject<UsersRepository>()
+    install(Authentication) {
+        session<UserSession>("user_session") {
+            validate { session ->
+                val user = usersRepository.getById(ObjectId(session.id))
+                if (user != null) {
+                    session
+                } else {
+                    null
+                }
+            }
+            challenge {
+                call.respondRedirect("/")
+            }
+        }
+        oauth("auth-oauth-yandex") {
+            urlProvider = { "http://localhost:8080/auth/callback/yandex" }
+            providerLookup = {
+                OAuthServerSettings.OAuth2ServerSettings(
+                    name = "yandex",
+                    authorizeUrl = "https://oauth.yandex.com/authorize",
+                    accessTokenUrl = "https://oauth.yandex.com/token",
+                    requestMethod = HttpMethod.Post,
+                    clientId = application.getYandexClientId(),
+                    clientSecret = application.getYandexClientSecret(),
+                    defaultScopes = listOf("login:email", "login:info"), // defined inside Yandex
+                    onStateCreated = { call, state ->
+                        call.request.queryParameters["redirectUrl"]?.let {
+                            redirects[state] = it //??? clear old states???
+                        }
+                    }
+                )
+            }
+            client = HttpClient;
+        }
+        oauth("auth-oauth-google") {
+            urlProvider = { "http://localhost:8080/auth/callback/google" }
+            providerLookup = {
+                OAuthServerSettings.OAuth2ServerSettings(
+                    name = "google",
+                    authorizeUrl = "https://accounts.google.com/o/oauth2/auth",
+                    accessTokenUrl = "https://accounts.google.com/o/oauth2/token",
+                    requestMethod = HttpMethod.Post,
+                    clientId = application.getGoogleClientId(),
+                    clientSecret = application.getGoogleClientSecret(),
+                    defaultScopes = listOf("https://www.googleapis.com/auth/userinfo.profile", "https://www.googleapis.com/auth/userinfo.email"),
+                    extraAuthParameters = listOf("access_type" to "offline", "prompt" to "consent"),
+                    onStateCreated = { call, state ->
+                        call.request.queryParameters["redirectUrl"]?.let {
+                            redirects[state] = it
+                        }
+                    }
+                )
+            }
+            client = HttpClient;
+        }
     }
+}
+
+val SecurityModule = module {
+    single { TokenEncryptor(System.getenv("ENCRYPTION_SECRET")) }
 }

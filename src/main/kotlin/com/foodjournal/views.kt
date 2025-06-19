@@ -14,8 +14,6 @@ data class InsertIncome(val login: String, val json: String)
 data class ExposedPreference(val id: Int, val login: String, val json: String)
 @Serializable
 data class InsertPreference(val login: String, val json: String)
-@Serializable
-data class UserSession(val login: String, val pass: String, val email: String)
 
 @Serializable
 data class MyPassword(val pass: String)

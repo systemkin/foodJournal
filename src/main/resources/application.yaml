@@ -4,10 +4,11 @@ ktor:
             - com.foodjournal.ApplicationKt.module
     deployment:
         port: 8080
-    database:
+    fooddb:
         path: "mongodb://localhost:27017"
         dbname: "foodJournal"
     security:
-        secret: "dev-secret"
-        google-client-id: "google-secret"
+        sign: "dev-secret111111"
+        encrypt: "dev-secret-encry"
+
     
