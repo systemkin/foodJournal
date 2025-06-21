@@ -118,6 +118,7 @@ fun Application.configureSecurity() {
                     clientId = application.getYandexClientId(),
                     clientSecret = application.getYandexClientSecret(),
                     defaultScopes = listOf("login:email", "login:info"), // defined inside Yandex
+                    extraAuthParameters = listOf("force_confirm" to "true" ),
                     onStateCreated = { call, state ->
                         call.request.queryParameters["redirectUrl"]?.let {
                             redirects[state] = it //??? clear old states???
@@ -127,6 +128,29 @@ fun Application.configureSecurity() {
             }
             client = HttpClient;
         }
+        oauth("change-provider-yandex") {
+            urlProvider = { "http://localhost:8080/change_provider/callback/yandex" }
+            providerLookup = {
+                OAuthServerSettings.OAuth2ServerSettings(
+                    name = "yandex",
+                    authorizeUrl = "https://oauth.yandex.com/authorize",
+                    accessTokenUrl = "https://oauth.yandex.com/token",
+                    requestMethod = HttpMethod.Post,
+                    clientId = application.getYandexClientId(),
+                    clientSecret = application.getYandexClientSecret(),
+                    defaultScopes = listOf("login:email", "login:info"), // defined inside Yandex
+                    extraAuthParameters = listOf("force_confirm" to "true" ),
+                    onStateCreated = { call, state ->
+                        call.request.queryParameters["redirectUrl"]?.let {
+                            redirects[state] = it //??? clear old states???
+                        }
+                    }
+                )
+            }
+            client = HttpClient;
+        }
+
+
         oauth("auth-oauth-google") {
             urlProvider = { "http://localhost:8080/auth/callback/google" }
             providerLookup = {
@@ -148,6 +172,29 @@ fun Application.configureSecurity() {
             }
             client = HttpClient;
         }
+        oauth("change-provider-google") {
+            urlProvider = { "http://localhost:8080/change_provider/callback/google" }
+            providerLookup = {
+                OAuthServerSettings.OAuth2ServerSettings(
+                    name = "google",
+                    authorizeUrl = "https://accounts.google.com/o/oauth2/auth",
+                    accessTokenUrl = "https://accounts.google.com/o/oauth2/token",
+                    requestMethod = HttpMethod.Post,
+                    clientId = application.getGoogleClientId(),
+                    clientSecret = application.getGoogleClientSecret(),
+                    defaultScopes = listOf("https://www.googleapis.com/auth/userinfo.profile", "https://www.googleapis.com/auth/userinfo.email"),
+                    extraAuthParameters = listOf("access_type" to "offline", "prompt" to "consent"),
+                    onStateCreated = { call, state ->
+                        call.request.queryParameters["redirectUrl"]?.let {
+                            redirects[state] = it
+                        }
+                    }
+                )
+            }
+            client = HttpClient;
+        }
+
+
     }
 }
 

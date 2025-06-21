@@ -109,8 +109,9 @@ class GoogleApiClient  (
         }
         if (response1.status == HttpStatusCode.Unauthorized) {
             if (refreshToken(userId)) {
+                val user2 = usersRepository.getById(userId)
                 val response2 = httpClient.get("https://openidconnect.googleapis.com/v1/userinfo") {
-                    header("Authorization", "Bearer ${user?.externalAuth?.accessToken}")
+                    header("Authorization", "Bearer ${user2?.externalAuth?.accessToken}")
                 }
                 val googleDataResponse = response2.body<GoogleResponse>();
                 return GeneralUserData(googleDataResponse.sub, googleDataResponse.email, googleDataResponse.name)

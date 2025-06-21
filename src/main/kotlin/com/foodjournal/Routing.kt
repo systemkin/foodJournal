@@ -40,14 +40,14 @@ fun Application.configureRouting() {
 
     install(StatusPages) {
         exception<Throwable> { call, cause ->
-            call.respondText(text = "$cause" , status = HttpStatusCode.InternalServerError) //
+            call.respondText(text = "$cause", status = HttpStatusCode.InternalServerError) //
         }
     }
 
     routing {
         authenticate("auth-oauth-yandex") {
             get("/auth/yandex") {
-                call.respondText(text = "Logged in" , status = HttpStatusCode.OK)
+                call.respondText(text = "Logged in", status = HttpStatusCode.OK)
             }
             get("auth/callback/yandex") {
                 val currentPrincipal: OAuthAccessTokenResponse.OAuth2? = call.principal()
@@ -58,8 +58,18 @@ fun Application.configureRouting() {
                         }.body<YandexResponse>()
                         val user = usersRepository.search("yandex", yandexUserData.id)
                         if (user == null) {
-                            call.sessions.set(UserSession(usersRepository.create(User(ObjectId(), ExternalAuth("yandex", principal.accessToken, "", yandexUserData.id))).toString()))
+                            call.sessions.set(
+                                UserSession(
+                                    usersRepository.create(
+                                        User(
+                                            ObjectId(),
+                                            ExternalAuth("yandex", principal.accessToken, "", yandexUserData.id)
+                                        )
+                                    ).toString()
+                                )
+                            )
                         } else call.sessions.set(UserSession(user.id.toString()))
+                        
 
                         redirects[state]?.let { redirect ->
                             call.respondRedirect(redirect)
@@ -72,7 +82,7 @@ fun Application.configureRouting() {
         }
         authenticate("auth-oauth-google") {
             get("/auth/google") {
-                call.respondText(text = "Logged in" , status = HttpStatusCode.OK)
+                call.respondText(text = "Logged in", status = HttpStatusCode.OK)
             }
             get("auth/callback/google") {
                 val currentPrincipal: OAuthAccessTokenResponse.OAuth2? = call.principal()
@@ -83,7 +93,21 @@ fun Application.configureRouting() {
                         }.body<GoogleResponse>()
                         val user = usersRepository.search("google", googleUserData.sub)
                         if (user == null) {
-                            call.sessions.set(UserSession(usersRepository.create(User(ObjectId(), ExternalAuth("google", principal.accessToken, principal.refreshToken?:"", googleUserData.sub))).toString()))
+                            call.sessions.set(
+                                UserSession(
+                                    usersRepository.create(
+                                        User(
+                                            ObjectId(),
+                                            ExternalAuth(
+                                                "google",
+                                                principal.accessToken,
+                                                principal.refreshToken ?: "",
+                                                googleUserData.sub
+                                            )
+                                        )
+                                    ).toString()
+                                )
+                            )
                         } else call.sessions.set(UserSession(user.id.toString()))
 
                         redirects[state]?.let { redirect ->
@@ -96,7 +120,7 @@ fun Application.configureRouting() {
             }
         }
         get("/") {
-            call.respondText(text = "Default route" , status = HttpStatusCode.OK)
+            call.respondText(text = "Default route", status = HttpStatusCode.OK)
         }
         authenticate("user_session") {
             get("/debug") {
@@ -106,16 +130,84 @@ fun Application.configureRouting() {
                 val provider = user?.externalAuth?.provider
                 val email = userId?.let { generalApiClient.getData(it)?.email } ?: "NULL"
                 val name = userId?.let { generalApiClient.getData(it)?.name } ?: "NULL"
-                call.respondText("""
+                call.respondText(
+                    """
                     Session ID: ${session?.id}
                     User ID: $userId
                     User: ${user?.id}
                     Auth Provider: $provider
                     Email: ${email}
                     Name: ${name}
-                """.trimIndent() ?: "")
+                """.trimIndent() ?: ""
+                )
+            }
+
+        }
+
+
+        authenticate("user_session") {
+            authenticate("change-provider-google", strategy = AuthenticationStrategy.Required)  {
+                get("/change_provider/google") {
+                    call.respondText(text = "Logged in", status = HttpStatusCode.OK)
+                }
+                get("/change_provider/callback/google") {
+                    val session = call.sessions.get<UserSession>()
+                    val currentPrincipal: OAuthAccessTokenResponse.OAuth2? = call.principal()
+                    currentPrincipal?.let { principal ->
+                        principal.state?.let { state ->
+                            state?.let { state ->
+                                val googleUserData = httpClient.get("https://openidconnect.googleapis.com/v1/userinfo") {
+                                    header("Authorization", "Bearer ${principal.accessToken}")
+                                }.body<GoogleResponse>()
+                                if (usersRepository.search("google", googleUserData.sub) != null) call.respondText("Already exist", status = HttpStatusCode.Conflict)
+
+                                val user = usersRepository.getById(ObjectId(session?.id))
+
+                                user!!.externalAuth = ExternalAuth("google", principal!!.accessToken, principal.refreshToken?: "", googleUserData.sub)
+
+                                usersRepository.update(user)
+
+                                redirects[state]?.let { redirect ->
+                                    call.respondRedirect(redirect)
+                                    return@get
+                                }
+                            }
+                        }
+                    }
+                    call.respondRedirect("/")
+                }
+            }
+        }
+        authenticate("change-provider-yandex", strategy = AuthenticationStrategy.Required)  {
+            get("/change_provider/yandex") {
+                call.respondText(text = "Logged in", status = HttpStatusCode.OK)
+            }
+            get("/change_provider/callback/yandex") {
+                val session = call.sessions.get<UserSession>()
+                val currentPrincipal: OAuthAccessTokenResponse.OAuth2? = call.principal()
+                currentPrincipal?.let { principal ->
+                    principal.state?.let { state ->
+                        state?.let { state ->
+                            val yandexUserData = httpClient.get("https://login.yandex.ru/info") {
+                                header("Authorization", "Bearer ${principal.accessToken}")
+                            }.body<YandexResponse>()
+                            if (usersRepository.search("yandex", yandexUserData.id) != null) call.respondText("Already exist", status = HttpStatusCode.Conflict)
+
+                            val user = usersRepository.getById(ObjectId(session?.id))
+
+                            user!!.externalAuth = ExternalAuth("yandex", principal!!.accessToken, principal.refreshToken?: "", yandexUserData.id)
+
+                            usersRepository.update(user)
+
+                            redirects[state]?.let { redirect ->
+                                call.respondRedirect(redirect)
+                                return@get
+                            }
+                        }
+                    }
+                }
+                call.respondRedirect("/")
             }
         }
     }
-
 }
