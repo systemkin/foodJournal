@@ -28,19 +28,19 @@ import io.ktor.http.HttpStatusCode
 
 
 
-
 fun Application.configureRouting() {
     val mealsRepository by inject<MealsRepository>()
     val usersRepository by inject<UsersRepository>()
     val redirects by inject<MutableMap<String, String>>()
     val httpClient by inject<HttpClient>()
     val generalApiClient by inject<GeneralApiClient>()
+    val foodsViewer by inject<FoodsViewer>()
 
     install(io.ktor.server.resources.Resources)
 
     install(StatusPages) {
         exception<Throwable> { call, cause ->
-            call.respondText(text = "$cause", status = HttpStatusCode.InternalServerError) //
+            call.respondText(text = "$cause", status = HttpStatusCode.InternalServerError)
         }
     }
 
@@ -122,8 +122,9 @@ fun Application.configureRouting() {
         get("/") {
             call.respondText(text = "Default route", status = HttpStatusCode.OK)
         }
+
         authenticate("user_session") {
-            get("/debug") {
+            get("/mydata") {
                 val session = call.sessions.get<UserSession>()
                 val userId = session?.id?.let { ObjectId(it) }
                 val user = userId?.let { usersRepository.getById(it) }
@@ -132,7 +133,6 @@ fun Application.configureRouting() {
                 val name = userId?.let { generalApiClient.getData(it)?.name } ?: "NULL"
                 call.respondText(
                     """
-                    Session ID: ${session?.id}
                     User ID: $userId
                     User: ${user?.id}
                     Auth Provider: $provider
@@ -146,7 +146,11 @@ fun Application.configureRouting() {
 
 
         authenticate("user_session") {
-            authenticate("change-provider-google", strategy = AuthenticationStrategy.Required)  {
+
+            authenticate("change-provider-google", strategy = AuthenticationStrategy.Required) {
+
+
+
                 get("/change_provider/google") {
                     call.respondText(text = "Logged in", status = HttpStatusCode.OK)
                 }
@@ -156,14 +160,64 @@ fun Application.configureRouting() {
                     currentPrincipal?.let { principal ->
                         principal.state?.let { state ->
                             state?.let { state ->
-                                val googleUserData = httpClient.get("https://openidconnect.googleapis.com/v1/userinfo") {
-                                    header("Authorization", "Bearer ${principal.accessToken}")
-                                }.body<GoogleResponse>()
-                                if (usersRepository.search("google", googleUserData.sub) != null) call.respondText("Already exist", status = HttpStatusCode.Conflict)
+                                val googleUserData =
+                                    httpClient.get("https://openidconnect.googleapis.com/v1/userinfo") {
+                                        header("Authorization", "Bearer ${principal.accessToken}")
+                                    }.body<GoogleResponse>()
+                                if (usersRepository.search(
+                                        "google",
+                                        googleUserData.sub
+                                    ) != null
+                                ) call.respondText("Already exist", status = HttpStatusCode.Conflict)
 
                                 val user = usersRepository.getById(ObjectId(session?.id))
 
-                                user!!.externalAuth = ExternalAuth("google", principal!!.accessToken, principal.refreshToken?: "", googleUserData.sub)
+                                user!!.externalAuth = ExternalAuth(
+                                    "google",
+                                    principal!!.accessToken,
+                                    principal.refreshToken ?: "",
+                                    googleUserData.sub
+                                )
+
+                                usersRepository.update(user)
+
+                                redirects[state]?.let { redirect ->
+                                    call.respondRedirect(redirect)
+                                    return@get
+                                }
+                            }
+                        }
+                    }
+                    call.respondRedirect("/")
+                }
+            }
+            authenticate("change-provider-yandex", strategy = AuthenticationStrategy.Required) {
+                get("/change_provider/yandex") {
+                    call.respondText(text = "Logged in", status = HttpStatusCode.OK)
+                }
+                get("/change_provider/callback/yandex") {
+                    val session = call.sessions.get<UserSession>()
+                    val currentPrincipal: OAuthAccessTokenResponse.OAuth2? = call.principal()
+                    currentPrincipal?.let { principal ->
+                        principal.state?.let { state ->
+                            state?.let { state ->
+                                val yandexUserData = httpClient.get("https://login.yandex.ru/info") {
+                                    header("Authorization", "Bearer ${principal.accessToken}")
+                                }.body<YandexResponse>()
+                                if (usersRepository.search(
+                                        "yandex",
+                                        yandexUserData.id
+                                    ) != null
+                                ) call.respondText("Already exist", status = HttpStatusCode.Conflict)
+
+                                val user = usersRepository.getById(ObjectId(session?.id))
+
+                                user!!.externalAuth = ExternalAuth(
+                                    "yandex",
+                                    principal!!.accessToken,
+                                    principal.refreshToken ?: "",
+                                    yandexUserData.id
+                                )
 
                                 usersRepository.update(user)
 
@@ -178,35 +232,108 @@ fun Application.configureRouting() {
                 }
             }
         }
-        authenticate("change-provider-yandex", strategy = AuthenticationStrategy.Required)  {
-            get("/change_provider/yandex") {
-                call.respondText(text = "Logged in", status = HttpStatusCode.OK)
-            }
-            get("/change_provider/callback/yandex") {
+        authenticate("user_session") {
+            staticResources("/static", "static")
+
+            get("/meals/id/{id}") {
                 val session = call.sessions.get<UserSession>()
-                val currentPrincipal: OAuthAccessTokenResponse.OAuth2? = call.principal()
-                currentPrincipal?.let { principal ->
-                    principal.state?.let { state ->
-                        state?.let { state ->
-                            val yandexUserData = httpClient.get("https://login.yandex.ru/info") {
-                                header("Authorization", "Bearer ${principal.accessToken}")
-                            }.body<YandexResponse>()
-                            if (usersRepository.search("yandex", yandexUserData.id) != null) call.respondText("Already exist", status = HttpStatusCode.Conflict)
-
-                            val user = usersRepository.getById(ObjectId(session?.id))
-
-                            user!!.externalAuth = ExternalAuth("yandex", principal!!.accessToken, principal.refreshToken?: "", yandexUserData.id)
-
-                            usersRepository.update(user)
-
-                            redirects[state]?.let { redirect ->
-                                call.respondRedirect(redirect)
-                                return@get
-                            }
-                        }
-                    }
+                val id = call.parameters["id"]
+                if (id == null) {
+                    call.respondText("Missing ID", status = HttpStatusCode.BadRequest)
+                    return@get
                 }
-                call.respondRedirect("/")
+                val meal = mealsRepository.getById(ObjectId(id))
+                if (meal == null) {
+                    call.respondText("No such meal or not an owner", status = HttpStatusCode.BadRequest)
+                    return@get
+                }
+                if (meal.owner != ObjectId(session!!.id)) {
+                    call.respondText("No such meal or not an owner", status = HttpStatusCode.BadRequest)
+                    return@get
+                }
+                call.respond(meal)
+            }
+
+            get("/meals/search") {
+                val session = call.sessions.get<UserSession>()
+                val startDate = call.request.queryParameters["start"]
+                val endDate = call.request.queryParameters["end"]
+                val starred = call.request.queryParameters["starred"]?.toBooleanStrictOrNull()
+
+                if (startDate == null || endDate == null || starred == null) {
+                    call.respondText("'starred', 'start' and 'end' are required", status = HttpStatusCode.BadRequest)
+                    return@get
+                }
+
+                val meals = mealsRepository.search(ObjectId(session!!.id), starred, Pair<String, String>(startDate, endDate))
+                call.respond(meals)
+            }
+
+            post("/meals") {
+                val session = call.sessions.get<UserSession>()
+                val postMeal = call.receive<postMeal>()
+                mealsRepository.create(postMeal, ObjectId(session?.id))
+                call.respond(HttpStatusCode.Created, "Created")
+            }
+
+            put("/meals") {
+                val session = call.sessions.get<UserSession>()
+                val updateMeal = call.receive<updateMeal>()
+                val ownerId = mealsRepository.getById(updateMeal.id)?.owner
+                if (ownerId == null) {
+                    call.respond(HttpStatusCode.NotFound, "Not found")
+                    return@put
+                }
+                if (ObjectId(session!!.id) != ownerId) {
+                    call.respond(HttpStatusCode.BadRequest, "Now an owner of a meal")
+                    return@put
+                }
+                if (mealsRepository.update(updateMeal))
+                    call.respond(HttpStatusCode.OK, "Update")
+                else call.respond(HttpStatusCode.InternalServerError, "Can't update")
+            }
+
+            delete("/meals/{id}") {
+                val id = call.parameters["id"]
+                if (id == null) {
+                    call.respondText("Missing ID", status = HttpStatusCode.BadRequest)
+                    return@delete
+                }
+                val session = call.sessions.get<UserSession>()
+                val ownerId = mealsRepository.getById(ObjectId(id))?.owner
+                if (ownerId == null) {
+                    call.respond(HttpStatusCode.NotFound, "Not found")
+                    return@delete
+                }
+                if (ObjectId(session!!.id) != ownerId) {
+                    call.respond(HttpStatusCode.BadRequest, "Now an owner of a meal")
+                    return@delete
+                }
+                if (mealsRepository.delete(ObjectId(id)))
+                    call.respond(HttpStatusCode.OK, "Deleted")
+                else call.respond(HttpStatusCode.InternalServerError, "Can't delete")
+            }
+
+            get("/foodsdb") {
+                val name = call.parameters["name"]
+                if (name == null) {
+                    call.respondText("missing 'name'", status = HttpStatusCode.BadRequest)
+                    return@get
+                } else
+                    call.respond(foodsViewer.getByName(name))
+            }
+
+            get("/userinfo") {
+                val session = call.sessions.get<UserSession>()
+                val data = usersRepository.getById(ObjectId(session!!.id));
+                if (data == null) 
+                    call.respond(HttpStatusCode.InternalServerError, "No user info found")
+                else
+                    call.respond(data) 
+            }
+
+            get("/defaultnutrients") {
+                call.respond(foodsViewer.getUniqueNutrientNames());
             }
         }
     }

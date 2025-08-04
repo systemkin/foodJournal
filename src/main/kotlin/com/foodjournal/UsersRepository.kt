@@ -25,7 +25,7 @@ import org.bson.Document
 data class EncryptedUser(
     @Contextual @BsonId val id: ObjectId = ObjectId(),
     var externalAuth: EncryptedExternalAuth,
-    val dailyGoals: Map<String, Double>? = mapOf()
+    val dailyGoals: List<Nutrient> = emptyList()
 )
 
 @Serializable
@@ -41,7 +41,7 @@ data class EncryptedExternalAuth(
 data class User(
     @Contextual @BsonId val id: ObjectId = ObjectId(),
     var externalAuth: ExternalAuth,
-    val dailyGoals: Map<String, Double>? = mapOf()
+    val dailyGoals: List<Nutrient> = emptyList()
 )
 
 @Serializable

@@ -69,6 +69,7 @@ data class UserSession(val id: String)
 
 fun Application.configureSecurity() {
     install(CSRF) {
+
         // tests Origin is an expected value
         allowOrigin("http://localhost:8080")
 
@@ -93,11 +94,13 @@ fun Application.configureSecurity() {
     val redirects by inject<MutableMap<String, String>>()
     val HttpClient by inject<HttpClient>()
     val usersRepository by inject<UsersRepository>()
+    val generalApiClient by inject<GeneralApiClient>()
     install(Authentication) {
         session<UserSession>("user_session") {
             validate { session ->
                 val user = usersRepository.getById(ObjectId(session.id))
-                if (user != null) {
+                val data = generalApiClient.getData(ObjectId(session.id)) // can be better, bad to request data to check validity only
+                if ((user != null) && (data != null)) {
                     session
                 } else {
                     null

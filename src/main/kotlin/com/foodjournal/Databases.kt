@@ -43,7 +43,7 @@ data class user(
 )
 data class meal(
     val id: ObjectId = ObjectId(),
-    val isStarred: Boolean,
+    val starred: Boolean,
     val time: String,
     val ingredients: Document = Document(),
     val owner: ObjectId
@@ -67,6 +67,7 @@ fun Application.configureDatabases() {
             val database: MongoDatabase = client.getDatabase(dbData.dbname)
             single { MealsRepository(database) }
             single { UsersRepository(database, get()) }
+            single { FoodsViewer(database) }
 
         }, OAuthModule)
     }
