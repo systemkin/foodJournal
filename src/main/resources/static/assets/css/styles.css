@@ -1,0 +1,130 @@
+
+@font-face {
+    font-family: "Lexend Deca";
+    src: url("../fonts/LexendDeca-Regular.ttf");
+  }
+body {
+    margin: 0px;
+    font-family: 'Lexend Deca';
+
+}
+div.header {
+    padding-left: 5px;
+    padding-right: 5px;
+    height: 50px;
+    background-color: #1C1F2A;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+div.flexHolder {
+    flex:1
+}
+div.text {
+    user-select: none;
+}
+div.text.whiteT {
+    color: white
+}
+div.text.grayT {
+    color: #BEBEBE
+}
+div.button {
+    background-color: #2E313C;
+    color: #BEBEBE;
+}
+div.fontNormal {
+    font-size: 16px;
+}
+div.fontBig {
+    font-size: 32px;
+}
+div.circleNormal {
+    width: 44px;
+    height: 44px;
+    border-radius: 22px;
+}
+div.center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+div.horizontalDivider {
+    height: 1px;
+    width: 100%;
+}
+div.whiteBG {
+    background-color: white;
+}
+div.grayBG {
+    background-color: #BEBEBE;
+}
+div.flexer{
+    display: flex;
+}
+div.space-between {
+    justify-content: space-between;
+}
+div.align-center {
+    align-items: center;
+}
+div.marginLow {
+    margin: 5px;
+}
+div.marginMid {
+    margin: 10px;
+}
+div.marginHigh {
+    margin: 15px;
+}
+div.marginHigher {
+    margin: 20px;
+}
+div.marginVerticalLow {
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+div.marginVerticalHigh {
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+div.ringSegmentHolder{
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+div.ringSegmentHolder.mid{
+    width: 100px;
+    height: 100px;
+}
+div.circleSegment {
+  border-radius: 50%;
+}
+
+div.circleSegment.mid {
+    width: 50px;
+    height: 50px;
+}
+div.circleSegment.midHover {
+    position: absolute;
+    width: 35px;
+    height: 35px;
+
+}
+.backgroundColor {
+    background-color: #010513;
+}
+.clickablePlateColor {
+    background-color: #2E313C;
+}
+.absolute {
+    position: absolute;
+}
+.borderMid {
+    border-radius: 5px;
+}
