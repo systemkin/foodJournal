@@ -36,68 +36,141 @@ data class Food(
     val foodNutrients: List<Nutrient>? = emptyList<Nutrient>()
 )
 
+@Serializable
+data class FoodDesc(
+    @Contextual @BsonId val id: ObjectId = ObjectId(),
+    val description: String,
+)
+
 @JsonIgnoreUnknownKeys
 @Serializable
 data class Nutrient(
     val nutrient: NutrientInfo? = null,
     val amount: Double? = 0.0
 )
+
 @JsonIgnoreUnknownKeys
 @Serializable
 data class NutrientInfo(
     val name: String? = "",
     val unitName: String?= ""
 )
+
 class FoodsViewer(database: MongoDatabase) {
     private val collection: MongoCollection<Food> = database.getCollection<Food>("foods")
+
+    suspend fun getByQuery(name: String): List<FoodDesc> {
+        return collection.aggregate<FoodDesc>(
+            listOf(
+                Aggregates.match(
+                    Filters.expr(
+                        Document("\$gt", listOf(
+                            Document("\$indexOfCP",
+                                listOf(
+                                    Document("\$toLower", "\$description"),
+                                    Document("\$toLower", name)
+                                )
+                            ),
+                            -1
+                        ))
+                    )
+                ),
+                Aggregates.addFields(
+                    Field<Any>("substringIndex",
+                        Document("\$indexOfCP",
+                            listOf(
+                                Document("\$toLower", "\$description"),
+                                Document("\$toLower", name)
+                            )
+                        )
+                    ),
+                ),
+                Aggregates.sort(Sorts.ascending("substringIndex")),
+                Aggregates.limit(50)
+            )
+        ).toList()
+    }
 
     suspend fun getByName(name: String): List<Food> {
         return collection.aggregate<Food>(
             listOf(
                 Aggregates.match(
                     Filters.expr(
-                        Document("\$regexMatch",
-                            Document()
-                                .append("input", "\$description")
-                                .append("regex", name)
-                                .append("options", "i")
-                        )
+                        Document("\$gt", listOf(
+                            Document("\$indexOfCP",
+                                listOf(
+                                    Document("\$toLower", "\$description"),
+                                    Document("\$toLower", name)
+                                )
+                            ),
+                            -1
+                        ))
                     )
                 ),
-                Aggregates.addFields(
-                    Field<Any>("substringIndex",
-                        Document("\$indexOfCP",
-                            listOf(Document("\$toLower", "\$description"), name)
-                        )
-                    ),
-                ),
-                Aggregates.sort(Sorts.ascending("substringIndex")),
-                Aggregates.limit(20)
+                Aggregates.limit(2)
             )
         ).toList()
     }
+
+    // Alternative simpler version using $indexOfBytes (faster in some cases)
+    suspend fun getByQuerySimple(name: String): List<FoodDesc> {
+        return collection.aggregate<FoodDesc>(
+            listOf(
+                Aggregates.match(
+                    Filters.expr(
+                        Document("\$gt", listOf(
+                            Document("\$indexOfBytes",
+                                listOf(
+                                    Document("\$toLower", "\$description"),
+                                    Document("\$toLower", name)
+                                )
+                            ),
+                            -1
+                        ))
+                    )
+                ),
+                Aggregates.limit(50)
+            )
+        ).toList()
+    }
+
+    private val nutrientCache = mutableMapOf<String, List<NutrientInfo>>()
+    private var lastCacheTime = 0L
+    private val CACHE_TTL = 24 * 60 * 60 * 1000 // day
+
     suspend fun getUniqueNutrientNames(): List<NutrientInfo> {
-        return collection.aggregate<NutrientInfo>(
+        val currentTime = System.currentTimeMillis()
+
+        if (nutrientCache.isNotEmpty() && currentTime - lastCacheTime < CACHE_TTL) {
+            return nutrientCache["uniqueNutrients"]!!
+        }
+        
+        val result = collection.aggregate<NutrientInfo>(
             listOf(
                 Aggregates.unwind(
                     "\$foodNutrients",
-                    UnwindOptions().preserveNullAndEmptyArrays(false) 
+                    UnwindOptions().preserveNullAndEmptyArrays(false)
                 ),
                 Aggregates.group(
                     Document().apply {
-                        put("nutrientName", "\$foodNutrients.nutrient.name")
+                        put("name", "\$foodNutrients.nutrient.name")
                         put("unitName", "\$foodNutrients.nutrient.unitName")
                     }
                 ),
                 Aggregates.project(
-                    Projections.fields(
-                        Projections.excludeId(),
-                        Projections.computed("nutrientName", "\$_id.nutrientName"),
-                        Projections.computed("unitName", "\$_id.unitName")
-                    )
+                    Document().apply {
+                        put("_id", 0)
+                        put("name", "\$_id.name")
+                        put("unitName", "\$_id.unitName")
+                    }
                 ),
-                Aggregates.sort(Document("nutrientName", 1))
+                Aggregates.sort(Document("name", 1))
             )
         ).toList()
+        
+        nutrientCache["uniqueNutrients"] = result
+        lastCacheTime = currentTime
+        
+        return result
     }
 }

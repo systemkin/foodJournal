@@ -6,111 +6,124 @@
 body {
     margin: 0px;
     font-family: 'Lexend Deca';
-
+    height: 100vh;
 }
-div.header {
+.header {
     padding-left: 5px;
     padding-right: 5px;
     height: 50px;
-    background-color: #1C1F2A;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
 }
-div.flexHolder {
+.headerColor {
+    background-color: #1C1F2A;
+}
+.flexHolder {
     flex:1
 }
-div.text {
+.text {
     user-select: none;
 }
-div.text.whiteT {
+.text.whiteT {
     color: white
 }
-div.text.grayT {
+.text.grayT {
     color: #BEBEBE
 }
-div.button {
+.text.backgroundT{
+    color: #010513
+}
+.button {
     background-color: #2E313C;
     color: #BEBEBE;
 }
-div.fontNormal {
+.fontNormal {
     font-size: 16px;
 }
-div.fontBig {
+.fontBig {
     font-size: 32px;
 }
-div.circleNormal {
+.circleNormal {
     width: 44px;
     height: 44px;
     border-radius: 22px;
 }
-div.center {
+.center {
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
-div.horizontalDivider {
+.horizontalDivider {
     height: 1px;
     width: 100%;
+    margin: 1px;
 }
-div.whiteBG {
+.whiteBG {
     background-color: white;
 }
-div.grayBG {
+.grayBG {
     background-color: #BEBEBE;
 }
-div.flexer{
+.flexer{
     display: flex;
 }
-div.space-between {
+.flexer.column {
+    flex-direction: column;
+}
+.flexer.row {
+    flex-direction: row;;
+}
+.space-between {
     justify-content: space-between;
 }
-div.align-center {
+.align-center {
     align-items: center;
 }
-div.marginLow {
-    margin: 5px;
+
+.paddingLow {
+    padding: 5px;
 }
-div.marginMid {
-    margin: 10px;
+.paddingMid {
+    padding: 10px;
 }
-div.marginHigh {
-    margin: 15px;
+.paddingHigh {
+    padding: 15px;
 }
-div.marginHigher {
-    margin: 20px;
+.paddingHigher {
+    padding: 20px;
 }
-div.marginVerticalLow {
-    margin-top: 5px;
-    margin-bottom: 5px;
+.paddingVerticalLow {
+    padding-top: 5px;
+    padding-bottom: 5px;
 }
 
-div.marginVerticalHigh {
-    margin-top: 15px;
-    margin-bottom: 15px;
+.paddingVerticalHigh {
+    padding-top: 15px;
+    padding-bottom: 15px;
 }
 
-div.ringSegmentHolder{
+.ringSegmentHolder{
     position: relative;
     display: flex;
     justify-content: center;
     align-items: center;
 }
-div.ringSegmentHolder.mid{
+.ringSegmentHolder.mid{
     width: 100px;
     height: 100px;
 }
-div.circleSegment {
+.circleSegment {
   border-radius: 50%;
 }
 
-div.circleSegment.mid {
+.circleSegment.mid {
     width: 50px;
     height: 50px;
 }
-div.circleSegment.midHover {
+.circleSegment.midHover {
     position: absolute;
     width: 35px;
     height: 35px;
@@ -127,4 +140,68 @@ div.circleSegment.midHover {
 }
 .borderMid {
     border-radius: 5px;
+}
+.borderHigh {
+    border-radius: 20px;
+}
+.marginHigh {
+    margin: 30px
+}
+.clickablePlate {
+    margin-top:4px;
+    margin-bottom: 4px;
+    display: flex;
+    flex-direction: column;
+    width: auto;
+    height: fit-content;
+    padding: 5px;
+    padding-left: 20px;
+    padding-right: 20px;
+}
+.textButton {
+    padding: 10px;
+    border-radius: 2px;
+    padding-left: 15px;
+    padding-right: 15px;
+}
+.textButton:hover {
+    transition: 100ms;
+    background-color: #1c2545;
+}
+.hoverable:hover {
+    transition: 100ms;
+}
+.grayHover:hover {
+    background-color: #3e414e;
+}
+.noPadding {
+    padding: 0px;
+}
+.space-around{  
+    justify-content: space-around;
+}
+.radioActive {
+    border: solid 3px #C0E38D;
+    border-radius: 100vh;
+    background-color: #C0E38D;
+    color: black;
+    padding: 10px;
+    padding-bottom: 5px;
+    padding-top: 5px;
+    min-width: 90px;
+}
+.radioUnactive {
+    border-radius: 100vh;
+    border: solid 3px white;
+    color: white;
+    padding: 10px;
+    padding-bottom: 5px;
+    padding-top: 5px;
+    min-width: 90px;
+}
+input.placeholderGrayBlack {
+
+}
+input.placeholderGray::placeholder {
+    color: #BEBEBE
 }

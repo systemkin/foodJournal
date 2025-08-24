@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <title>FoodJournal</title>
+    <link rel="stylesheet" href="assets/css/styles.css" />
+</head>
+<body class = "backgroundColor flexer column">
+    <div class="header headerColor">
+        <div class="button fontBig circleNormal center text">?</div>
+        <div class="flexHolder"></div>
+        <div id ="nicknameHolder" class="text grayT fontMid marginLow">Nickname</div>
+        <div class="button fontBig circleNormal center text">Q</div>
+    </div>
+    
+    <div class = flexer>
+        <div class = "flexer column clickablePlateColor borderHigh flexHolder" style="padding-top: 2px; padding-left:20px; padding-right: 20px; padding-bottom: 8px; margin: 20px;">
+            <div class = "text grayT">
+                Start
+            </div>
+            <input onchange="resetDate()"  type="datetime-local" id="startTime" class = "clickablePlateColor text whiteT hoverable grayHover paddingLow" style = "display: flex; flex-direction: row-reverse;   border:none; font-family: 'Lexend Deca'">
+        </div>
+        <div class = "flexer column clickablePlateColor borderHigh flexHolder" style="padding-top: 2px; padding-left:20px; padding-right: 20px; padding-bottom: 8px; margin: 20px;">
+            <div class = "text grayT">
+                End
+            </div>
+            <input onchange="resetDate()"  type="datetime-local" id="endTime" class = "clickablePlateColor text whiteT hoverable grayHover paddingLow" style = "display: flex; flex-direction: row-reverse;   border:none; font-family: 'Lexend Deca'">
+        </div>
+    </div>
+    <div class = "flexer space-around" >
+        <div class = "flexer text whiteT textButton fontMid" onclick="reset()">
+            Reset
+        </div>
+        <div class = "flexer text whiteT textButton fontMid" onclick="check()">
+            Check
+        </div>
+    </div>
+    <div class="horizontalDivider grayBG"></div>
+    <div class = "flexer space-around" style="margin-top: 20px; margin-bottom: 10px;" >
+        <div id ="radioNutrients" class = "radioActive center" onclick = "makeNutrientsActive()">
+            Nutrients
+        </div>
+        <div id ="radioMeals" class = "radioUnactive center" onclick = "makeMealsActive()">
+            Meals
+        </div>
+    </div>
+
+    <div class = "noPadding clickablePlate clickablePlateColor ">
+        <div onclick = "addNutrient()" class = "center text backgroundT fontBig textButton noPadding">+</div>
+    </div>
+    <div id = "journalHolder" class = "flexHolder">
+        
+    </div>
+    <div id = "footer" class = "header headerColor">
+        <div class="button fontBig circleNormal center text" style = "border: 2px solid #BEBEBE">J</div>
+        <div class="button fontBig circleNormal center text" onclick="redirectToAdd()">A</div>
+        <div class="button fontBig circleNormal center text">S</div>
+    </div>
+    
+    
+</body>
+<script src = "assets/js/scriptJournal.js"></script>
+</html>

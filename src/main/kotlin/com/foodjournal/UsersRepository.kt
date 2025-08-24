@@ -41,7 +41,7 @@ data class EncryptedExternalAuth(
 data class User(
     @Contextual @BsonId val id: ObjectId = ObjectId(),
     var externalAuth: ExternalAuth,
-    val dailyGoals: List<Nutrient> = emptyList()
+    var dailyGoals: List<Nutrient> = emptyList()
 )
 
 @Serializable
@@ -54,7 +54,6 @@ data class ExternalAuth(
 
 class UsersRepository(database: MongoDatabase, private val encryptor: TokenEncryptor) {
     private val collection: MongoCollection<EncryptedUser> = database.getCollection<EncryptedUser>("users")
-
 
     private suspend fun encryptUser(user: User) : EncryptedUser {
         return EncryptedUser(

@@ -24,9 +24,13 @@ import io.ktor.http.*
 import io.ktor.client.call.body
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonIgnoreUnknownKeys
+import kotlinx.serialization.decodeFromString
 import io.ktor.http.HttpStatusCode
 
 
+fun checkGoalsValidity(goals: List<Nutrient>): Boolean {
+    return !(goals.map { it.nutrient?.name }.distinct().size != goals.size)
+}
 
 fun Application.configureRouting() {
     val mealsRepository by inject<MealsRepository>()
@@ -118,9 +122,6 @@ fun Application.configureRouting() {
                 }
                 call.respondRedirect("/")
             }
-        }
-        get("/") {
-            call.respondText(text = "Default route", status = HttpStatusCode.OK)
         }
 
         authenticate("user_session") {
@@ -233,21 +234,21 @@ fun Application.configureRouting() {
             }
         }
         authenticate("user_session") {
-            staticResources("/static", "static")
+            staticResources("/", "static")
 
-            get("/meals/id/{id}") {
+            get("/meals/{id}") {
                 val session = call.sessions.get<UserSession>()
                 val id = call.parameters["id"]
                 if (id == null) {
                     call.respondText("Missing ID", status = HttpStatusCode.BadRequest)
                     return@get
                 }
-                val meal = mealsRepository.getById(ObjectId(id))
+                val meal = mealsRepository.getById(id)
                 if (meal == null) {
                     call.respondText("No such meal or not an owner", status = HttpStatusCode.BadRequest)
                     return@get
                 }
-                if (meal.owner != ObjectId(session!!.id)) {
+                if (meal.owner != session!!.id) {
                     call.respondText("No such meal or not an owner", status = HttpStatusCode.BadRequest)
                     return@get
                 }
@@ -259,20 +260,71 @@ fun Application.configureRouting() {
                 val startDate = call.request.queryParameters["start"]
                 val endDate = call.request.queryParameters["end"]
                 val starred = call.request.queryParameters["starred"]?.toBooleanStrictOrNull()
+                val description = call.request.queryParameters["description"]
+                val pairOrNull: Pair<String, String>? = if (startDate != null && endDate != null) Pair(startDate, endDate) else null 
+                val meals = mealsRepository.search(session!!.id, starred, pairOrNull, description)
+                call.respond(meals)
+            }
 
-                if (startDate == null || endDate == null || starred == null) {
-                    call.respondText("'starred', 'start' and 'end' are required", status = HttpStatusCode.BadRequest)
+            get("meals/{id}/images/{imageId}") {
+                val id = call.parameters["id"]
+                
+                if (id == null) {
+                    call.respondText("Missing meal id", status = HttpStatusCode.BadRequest)
+                    return@get
+                }
+                val session = call.sessions.get<UserSession>()
+                val ownerId = mealsRepository.getById(id)?.owner
+                if (ownerId == null) {
+                    call.respond(HttpStatusCode.NotFound, "Not found")
+                    return@get
+                }
+                if (session!!.id != ownerId) {
+                    call.respond(HttpStatusCode.BadRequest, "Now an owner of a meal")
+                    return@get
+                }
+                val imageId = call.parameters["imageId"]
+                if (imageId == null) {
+                    call.respondText("Missing image id", status = HttpStatusCode.BadRequest)
                     return@get
                 }
 
-                val meals = mealsRepository.search(ObjectId(session!!.id), starred, Pair<String, String>(startDate, endDate))
-                call.respond(meals)
+                val image = mealsRepository.getById(id)?.images[0];
+                if (image == null) {
+                    call.respondText("No such Image", status = HttpStatusCode.BadRequest)
+                    return@get
+                }
+                var imageData = image
+                if (imageData != null) {
+
+                    val base64Data = imageData.substring(imageData.indexOf(",") + 1)
+                    val imageBytes = Base64.getDecoder().decode(base64Data)
+
+                    val contentType = when {
+                        imageData.startsWith("data:image/webp") -> "image/webp"
+                        imageData.startsWith("data:image/jpeg") -> "image/jpeg"
+                        imageData.startsWith("data:image/png") -> "image/png"
+                        else -> "application/octet-stream"
+                    }
+                    
+                    call.response.header(HttpHeaders.ContentType, contentType)
+                    call.respondBytes(imageBytes)
+                } else {
+                    call.respond(HttpStatusCode.NotFound)
+                }
+
             }
 
             post("/meals") {
                 val session = call.sessions.get<UserSession>()
                 val postMeal = call.receive<postMeal>()
-                mealsRepository.create(postMeal, ObjectId(session?.id))
+                if (postMeal.starred) {
+                    if (mealsRepository.search(session!!.id, true, null, postMeal.description).size != 0) {
+                        call.respond(HttpStatusCode.Conflict, "Already Exists")
+                        return@post
+                    }
+                }
+                mealsRepository.create(postMeal, session!!.id)
                 call.respond(HttpStatusCode.Created, "Created")
             }
 
@@ -284,13 +336,23 @@ fun Application.configureRouting() {
                     call.respond(HttpStatusCode.NotFound, "Not found")
                     return@put
                 }
-                if (ObjectId(session!!.id) != ownerId) {
+                if (session!!.id != ownerId) {
                     call.respond(HttpStatusCode.BadRequest, "Now an owner of a meal")
                     return@put
                 }
+
+                val oldDescription = mealsRepository.getById(updateMeal.id)!!.description;
+                if ((updateMeal.starred) && (oldDescription != updateMeal.description)) {
+                    if (mealsRepository.search(ownerId, true, null, updateMeal.description).size != 0) {
+                        call.respond(HttpStatusCode.Conflict, "Already Exists")
+                        return@put
+                    }
+                }
+
+
                 if (mealsRepository.update(updateMeal))
                     call.respond(HttpStatusCode.OK, "Update")
-                else call.respond(HttpStatusCode.InternalServerError, "Can't update")
+                else call.respond(HttpStatusCode.OK, "Nothing to update")
             }
 
             delete("/meals/{id}") {
@@ -300,16 +362,16 @@ fun Application.configureRouting() {
                     return@delete
                 }
                 val session = call.sessions.get<UserSession>()
-                val ownerId = mealsRepository.getById(ObjectId(id))?.owner
+                val ownerId = mealsRepository.getById(id)?.owner
                 if (ownerId == null) {
                     call.respond(HttpStatusCode.NotFound, "Not found")
                     return@delete
                 }
-                if (ObjectId(session!!.id) != ownerId) {
+                if (session!!.id != ownerId) {
                     call.respond(HttpStatusCode.BadRequest, "Now an owner of a meal")
                     return@delete
                 }
-                if (mealsRepository.delete(ObjectId(id)))
+                if (mealsRepository.delete(id))
                     call.respond(HttpStatusCode.OK, "Deleted")
                 else call.respond(HttpStatusCode.InternalServerError, "Can't delete")
             }
@@ -320,19 +382,48 @@ fun Application.configureRouting() {
                     call.respondText("missing 'name'", status = HttpStatusCode.BadRequest)
                     return@get
                 } else
+                    call.respond(foodsViewer.getByQuery(name))
+            }
+            get("/foodsdb/full") {
+                val name = call.parameters["name"]
+                if (name == null) {
+                    call.respondText("missing 'name'", status = HttpStatusCode.BadRequest)
+                    return@get
+                } else
                     call.respond(foodsViewer.getByName(name))
             }
 
             get("/userinfo") {
                 val session = call.sessions.get<UserSession>()
-                val data = usersRepository.getById(ObjectId(session!!.id));
+                val data = generalApiClient.getData(ObjectId(session!!.id));
                 if (data == null) 
                     call.respond(HttpStatusCode.InternalServerError, "No user info found")
                 else
                     call.respond(data) 
             }
-
+            get("/dailygoals") {
+                val session = call.sessions.get<UserSession>()
+                val data = usersRepository.getById(ObjectId(session!!.id));
+                if (data == null) 
+                    call.respond(HttpStatusCode.InternalServerError, "No user info found")
+                else
+                    call.respond(data.dailyGoals) 
+            }
+            put("/dailygoals") {
+                val session = call.sessions.get<UserSession>();
+                val newGoals = call.receive<List<Nutrient>>();
+                val valid = checkGoalsValidity(newGoals);
+                if (!valid) {
+                    call.respond(HttpStatusCode.BadRequest, "Duplicating nutrients")
+                    return@put
+                }
+                var user = usersRepository.getById(ObjectId(session?.id));
+                user!!.dailyGoals = newGoals;
+                usersRepository.update(user);
+                call.respond(HttpStatusCode.Created, "Created")
+            }
             get("/defaultnutrients") {
+                
                 call.respond(foodsViewer.getUniqueNutrientNames());
             }
         }

@@ -1,0 +1,5 @@
+Day divisors
+Page with recommendations and researches
+Maybe a calculator of carbs, fats... 
+Creating user -> autosetting some default values
+PAYMENT?

@@ -107,7 +107,7 @@ fun Application.configureSecurity() {
                 }
             }
             challenge {
-                call.respondRedirect("/")
+                call.respondRedirect("/login")
             }
         }
         oauth("auth-oauth-yandex") {
