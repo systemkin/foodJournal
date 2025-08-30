@@ -8,7 +8,11 @@ data/
 
 ### Security ###
 client_secret*.json
-
+*.key
+*.crt
+*.pem
+*.p12
+*.jks
 
 ### STS ###
 .apt_generated

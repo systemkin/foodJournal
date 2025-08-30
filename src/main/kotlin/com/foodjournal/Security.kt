@@ -67,14 +67,22 @@ data class EncryptedData(val iv: String, val ciphertext: String)
 data class UserSession(val id: String)
 
 
+fun Application.getIP(): String {
+    //return "http://192.168.31.183:8080"
+    return environment.config.property("ktor.deployment.address").getString();
+}
+
 fun Application.configureSecurity() {
     install(CSRF) {
 
         // tests Origin is an expected value
-        allowOrigin("http://localhost:8080")
+        allowOrigin(this@configureSecurity.getIP())
 
+        //Now working behind proxy
+        //Expects "Host" field, but HTTP/2 have :authority pseudo-header to serve same purpose. I dont see any means to nicely fix this except manual requests processing
         // tests Origin matches Host header
-        originMatchesHost()
+        //originMatchesHost()
+        
 
     }
     install(Sessions) {
@@ -107,11 +115,11 @@ fun Application.configureSecurity() {
                 }
             }
             challenge {
-                call.respondRedirect("/login")
+                call.respondRedirect("/login.html")
             }
         }
         oauth("auth-oauth-yandex") {
-            urlProvider = { "http://localhost:8080/auth/callback/yandex" }
+            urlProvider = { application.getIP() + "/auth/callback/yandex" }
             providerLookup = {
                 OAuthServerSettings.OAuth2ServerSettings(
                     name = "yandex",
@@ -132,7 +140,7 @@ fun Application.configureSecurity() {
             client = HttpClient;
         }
         oauth("change-provider-yandex") {
-            urlProvider = { "http://localhost:8080/change_provider/callback/yandex" }
+            urlProvider = { application.getIP() + "/change_provider/callback/yandex" }
             providerLookup = {
                 OAuthServerSettings.OAuth2ServerSettings(
                     name = "yandex",
@@ -155,7 +163,7 @@ fun Application.configureSecurity() {
 
 
         oauth("auth-oauth-google") {
-            urlProvider = { "http://localhost:8080/auth/callback/google" }
+            urlProvider = { application.getIP() + "/auth/callback/google" }
             providerLookup = {
                 OAuthServerSettings.OAuth2ServerSettings(
                     name = "google",
@@ -176,7 +184,7 @@ fun Application.configureSecurity() {
             client = HttpClient;
         }
         oauth("change-provider-google") {
-            urlProvider = { "http://localhost:8080/change_provider/callback/google" }
+            urlProvider = { application.getIP() + "/change_provider/callback/google" }
             providerLookup = {
                 OAuthServerSettings.OAuth2ServerSettings(
                     name = "google",

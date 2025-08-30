@@ -5,26 +5,26 @@
     <title>FoodJournal</title>
     <link rel="stylesheet" href="assets/css/styles.css" />
 </head>
-<body class = "backgroundColor flexer column">
+<body class = "backgroundColor flexer column" style = "height: 100vh; height: 100dvh">
     <div class="header headerColor">
         <div class="button fontBig circleNormal center text">?</div>
         <div class="flexHolder"></div>
         <div id ="nicknameHolder" class="text grayT fontMid marginLow">Nickname</div>
-        <div class="button fontBig circleNormal center text">Q</div>
+        <div class="button fontBig circleNormal center text" onclick="logoff()">Q</div>
     </div>
     
-    <div class = flexer>
-        <div class = "flexer column clickablePlateColor borderHigh flexHolder" style="padding-top: 2px; padding-left:20px; padding-right: 20px; padding-bottom: 8px; margin: 20px;">
+    <div class = flexer style = "justify-content: center;" >
+        <div class = "flexer column clickablePlateColor borderHigh " style="padding-top: 4px; padding-left:40px; padding-right: 40px; padding-bottom: 16px; margin: 40px; font-size: 24px;">
             <div class = "text grayT">
                 Start
             </div>
-            <input onchange="resetDate()"  type="datetime-local" id="startTime" class = "clickablePlateColor text whiteT hoverable grayHover paddingLow" style = "display: flex; flex-direction: row-reverse;   border:none; font-family: 'Lexend Deca'">
+            <input onchange="resetDate()"  type="datetime-local" id="startTime" class = "clickablePlateColor text whiteT hoverable grayHover paddingLow" style = "font-size: 24px; width:min-content; display: flex; flex-direction: row-reverse;   border:none; font-family: 'Lexend Deca'">
         </div>
-        <div class = "flexer column clickablePlateColor borderHigh flexHolder" style="padding-top: 2px; padding-left:20px; padding-right: 20px; padding-bottom: 8px; margin: 20px;">
+        <div class = "flexer column clickablePlateColor borderHigh " style="padding-top: 4px; padding-left:40px; padding-right: 40px; padding-bottom: 16px; margin: 40px;">
             <div class = "text grayT">
                 End
             </div>
-            <input onchange="resetDate()"  type="datetime-local" id="endTime" class = "clickablePlateColor text whiteT hoverable grayHover paddingLow" style = "display: flex; flex-direction: row-reverse;   border:none; font-family: 'Lexend Deca'">
+            <input onchange="resetDate()"  type="datetime-local" id="endTime" class = "clickablePlateColor text whiteT hoverable grayHover paddingLow" style = "font-size: 24px; width:min-content; display: flex; flex-direction: row-reverse;   border:none; font-family: 'Lexend Deca'">
         </div>
     </div>
     <div class = "flexer space-around" >
@@ -36,7 +36,7 @@
         </div>
     </div>
     <div class="horizontalDivider grayBG"></div>
-    <div class = "flexer space-around" style="margin-top: 20px; margin-bottom: 10px;" >
+    <div class = "flexer space-around" style="margin-top: 40px; margin-bottom: 20px;" >
         <div id ="radioNutrients" class = "radioActive center" onclick = "makeNutrientsActive()">
             Nutrients
         </div>
@@ -52,7 +52,7 @@
         
     </div>
     <div id = "footer" class = "header headerColor">
-        <div class="button fontBig circleNormal center text" style = "border: 2px solid #BEBEBE">J</div>
+        <div class="button fontBig circleNormal center text" style = "border: 4px solid #BEBEBE">J</div>
         <div class="button fontBig circleNormal center text" onclick="redirectToAdd()">A</div>
         <div class="button fontBig circleNormal center text">S</div>
     </div>

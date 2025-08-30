@@ -92,6 +92,20 @@ class FoodsViewer(database: MongoDatabase) {
     }
 
     suspend fun getByName(name: String): List<Food> {
+
+
+        val filters = mutableListOf<Bson>()
+        filters.add(Filters.eq("description", name))
+
+        val filter = if (filters.isEmpty()) Filters.empty() else Filters.and(filters)
+
+        val mealList = collection.find(filter)
+            .limit(2)
+            .toList()
+        
+        return mealList;
+
+
         return collection.aggregate<Food>(
             listOf(
                 Aggregates.match(
@@ -112,27 +126,6 @@ class FoodsViewer(database: MongoDatabase) {
         ).toList()
     }
 
-    // Alternative simpler version using $indexOfBytes (faster in some cases)
-    suspend fun getByQuerySimple(name: String): List<FoodDesc> {
-        return collection.aggregate<FoodDesc>(
-            listOf(
-                Aggregates.match(
-                    Filters.expr(
-                        Document("\$gt", listOf(
-                            Document("\$indexOfBytes",
-                                listOf(
-                                    Document("\$toLower", "\$description"),
-                                    Document("\$toLower", name)
-                                )
-                            ),
-                            -1
-                        ))
-                    )
-                ),
-                Aggregates.limit(50)
-            )
-        ).toList()
-    }
 
     private val nutrientCache = mutableMapOf<String, List<NutrientInfo>>()
     private var lastCacheTime = 0L

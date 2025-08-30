@@ -123,6 +123,7 @@ class MealsRepository(database: MongoDatabase) {
     }
     private val collection: MongoCollection<dbMeal> = database.getCollection<dbMeal>("meals")
     suspend fun create(meal: Meal): String {
+
         collection.insertOne(toDbMeal(meal))
         return meal.id
     }

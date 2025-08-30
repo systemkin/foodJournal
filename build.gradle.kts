@@ -36,11 +36,8 @@ tasks {
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     }
 }
-tasks.withType<JavaCompile> {
-    sourceCompatibility = "23"
-    targetCompatibility = "23"
-}
-val ktor_version = "3.1.2"
+
+val ktor_version = "3.2.0"
 dependencies {
     testImplementation(kotlin("test"))
     implementation("org.mindrot:jbcrypt:0.4")
@@ -75,15 +72,14 @@ dependencies {
     testImplementation("io.ktor", "ktor-server-tests", "2.3.11")
     testImplementation("org.jetbrains.kotlin", "kotlin-test-junit", "1.9.10")
     implementation(kotlin("test"))
-    implementation("io.ktor", "ktor-server-core", "2.3.11")
-    implementation("io.ktor", "ktor-server-netty", "2.3.11")
+
     implementation("io.ktor", "ktor-serialization-jackson", "2.3.11")
-    implementation("io.ktor:ktor-server-core:2.x.x")
-    implementation("io.ktor:ktor-server-netty:2.x.x")
+    implementation("io.ktor:ktor-server-core:$ktor_version")
+    implementation("io.ktor:ktor-server-netty:$ktor_version")
     testImplementation("org.junit.jupiter:junit-jupiter:5.x.x")
     implementation("io.ktor:ktor-server-tests:2.x.x")
     implementation("org.jetbrains.kotlin:kotlin-test:1.x.x")
-    implementation("io.ktor:ktor-client-content-negotiation:3.0.2")
+    implementation("io.ktor:ktor-client-content-negotiation:$ktor_version")
     implementation("io.ktor:ktor-server-auth:$ktor_version")
     implementation("io.ktor:ktor-server-auth-jwt:$ktor_version")
     implementation("io.ktor:ktor-server-core:$ktor_version")
@@ -96,4 +92,6 @@ dependencies {
     implementation("org.mongodb:mongodb-driver-sync:4.11.0")
     implementation("org.mongodb:bson-kotlin:4.11.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
+    implementation("io.ktor:ktor-network-tls-certificates:$ktor_version")
+    
 }

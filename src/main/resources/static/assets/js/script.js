@@ -123,23 +123,27 @@ async function changeStarring() {
         document.getElementById("star").src = "assets/images/filledStar.png"
     else document.getElementById("star").src = "assets/images/emptyStar.png"
 }
-
+async function logoff() {
+    await fetch("/logoff") 
+    window.location.href = "/login.html"
+}
 
 async function showAddIngredientWindow() {
     nutrientsSequence = 0;
+    document.body.style.overflow = "clip";
     document.body.insertAdjacentHTML('beforeend', `
-    <div id = "addIngredientWindow" class = "backgroundColor"style="position: absolute; display: flex; flex-direction:column;top: 0px; left: 0px; width:100%; height : 100vh">
+    <div id = "addIngredientWindow" class = "backgroundColor"style="position: fixed; display: flex; flex-direction:column;top: 0px; left: 0px; width:101%; height: 101vh; height : 100dvh">
         <div class = "text grayT paddingHigh">
                 Adding ingredient
             </div>
         <div class="horizontalDivider grayBG"></div>
-        <div class = "clickablePlate clickablePlateColor" style = "margin-top:15px; margin-bottom: 15px;">
+        <div class = "clickablePlate clickablePlateColor" style = "margin-top:30px; margin-bottom: 30px;">
             <div class = "left text grayT">Name</div>
             <input list="suggestions3" oninput="descriptionChanged()" placeholder="optional" id="ingredientDescription" class = "clickablePlateColor center text whiteT hoverable grayHover paddingLow" style = "text-align:end; border:none; font-family: 'Lexend Deca'">
         </div>
         <datalist id="suggestions3">
         </datalist>   
-        <div class = "clickablePlate clickablePlateColor" style = "margin-top:15px; margin-bottom: 15px;">
+        <div class = "clickablePlate clickablePlateColor" style = "margin-top:30px; margin-bottom: 30px;">
             <div class = "left text grayT">Grams</div>
             <input placeholder="100.0" type="number" step="any" id="unitsAmount" class = "clickablePlateColor center text whiteT hoverable grayHover paddingLow" style = "text-align:end; border:none; font-family: 'Lexend Deca'">
         </div>  
@@ -148,10 +152,10 @@ async function showAddIngredientWindow() {
             <div class = "text grayT paddingHigh">
                 Nutrients per 100g
             </div>
-            <div onclick = "loadFromDb()" class = "flexer text whiteT textButton" style = "align-items: center">
+            <div onclick = "loadFromDb()" class = "flexer text whiteT textButton" style = "align-items: center; text-align:center">
                 Load from database
             </div>
-            <div onclick = "loadIngredientFromStarred()" class = "flexer text whiteT textButton" style = "align-items: center">
+            <div onclick = "loadIngredientFromStarred()" class = "flexer text whiteT textButton" style = "align-items: center; text-align:center">
                 Load from starred
             </div>  
         </div>
@@ -247,21 +251,22 @@ async function descriptionChanged() {
 }
 async function closeAddIngredientWindow() {
     document.getElementById("addIngredientWindow").remove();
+    document.body.style.overflow = "unset";
     nutrients.clear();
     nutrientsSet.clear();
 }
 async function showAddNutrient(){
     document.body.insertAdjacentHTML('beforeend', `
     <div id="nutrientWindow" style="display:flex; width:100%;height: 100%;position: absolute;justify-content: center;align-content: center;align-items: center;"> 
-        <div style="background-color: #5C5C5C; border-radius: 15px; padding: 10px">
+        <div style="background-color: #5C5C5C; border-radius: 30px; padding: 20px">
             <div class = "flexer column" > 
-                <input onchange="manageUnit()" placeholder="Name" id="nutrientName" list="suggestions" class = "placeholderGray  center text whiteT hoverable grayHover paddingLow" style = "background-color: #5C5C5C;margin: 15px;  border:2px solid #1e1e1e; border-radius:5px;  font-family: 'Lexend Deca'">
+                <input onchange="manageUnit()" placeholder="Name" id="nutrientName" list="suggestions" class = "placeholderGray  center text whiteT hoverable grayHover paddingLow" style = "background-color: #5C5C5C;margin: 30px;  border:4px solid #1e1e1e; border-radius:10px;  font-family: 'Lexend Deca'">
                 <datalist id="suggestions">
                     ` + buildSuggestions() + `
                 </datalist>
                 <div class = "flexer row" style = "align-items: center">
-                    <input onclick="manageUnit()" placeholder="Amount" type="number" id="nutrientAmount" class = "placeholderGray center text whiteT hoverable grayHover paddingLow" style = "background-color: #5C5C5C;margin: 15px;  border:2px solid #1e1e1e; border-radius:5px; font-family: 'Lexend Deca'">
-                    <input list="suggestionsUnit" placeholder="Unit"  id="nutrientUnit" class = "placeholderGray center text whiteT hoverable grayHover paddingLow" style = "width: 50px;background-color: #5C5C5C;margin: 15px;  border:2px solid #1e1e1e; border-radius:5px; font-family: 'Lexend Deca'">
+                    <input onclick="manageUnit()" placeholder="Amount" type="number" id="nutrientAmount" class = "placeholderGray center text whiteT hoverable grayHover paddingLow" style = "background-color: #5C5C5C;margin: 30px;  border:4px solid #1e1e1e; border-radius:10px; font-family: 'Lexend Deca'">
+                    <input list="suggestionsUnit" placeholder="Unit"  id="nutrientUnit" class = "placeholderGray center text whiteT hoverable grayHover paddingLow" style = "width: 100px;background-color: #5C5C5C;margin: 30px;  border:4px solid #1e1e1e; border-radius:10px; font-family: 'Lexend Deca'">
                     <datalist id="suggestionsUnit">
                     </datalist>
                 </div>
@@ -308,12 +313,12 @@ async function confirmAddNutrient() {
     nutrients.set(nutrientsSequence, { amount, nutrient });
     nutrientsSet.add(nutrient.name);
     document.getElementById("nutrientsTable").innerHTML += `
-        <div id = n_`+nutrientsSequence+` class = "flexer row space-between clickablePlate clickablePlateColor" style = "padding-left: 5px; padding-right: 5px;">
+        <div id = n_`+nutrientsSequence+` class = "flexer row space-between clickablePlate clickablePlateColor" style = "padding-left: 10px; padding-right: 10px;">
             <div class = "text grayT fontMid noPadding">`+ name +`</div>
             <div class = "flexer row">
                 <div class = "text grayT fontMid noPadding">`+amount+ " " + unit + `</div>
-                <div onclick="editNutrient(`+nutrientsSequence+`)"class = "text backgroundT fontMid" style = "margin-left: 20px;">E</div>
-                <div onclick="deleteNutrient(`+nutrientsSequence+`)"class = "text backgroundT fontMid" style = "margin-left: 20px;">X</div>
+                <div onclick="editNutrient(`+nutrientsSequence+`)"class = "text backgroundT fontMid" style = "margin-left: 40px;">E</div>
+                <div onclick="deleteNutrient(`+nutrientsSequence+`)"class = "text backgroundT fontMid" style = "margin-left: 40px;">X</div>
             </div>
         </div>
     `
@@ -333,15 +338,15 @@ async function deleteIngredient(ingredientNumber) {
 async function editNutrient(nutrientNumber) {
     document.body.insertAdjacentHTML('beforeend', `
     <div data-nnum = "`+nutrientNumber+`" id="nutrientEditWindow" style="display:flex; width:100%;height: 100%;position: absolute;justify-content: center;align-content: center;align-items: center;"> 
-        <div style="background-color: #5C5C5C; border-radius: 15px; padding: 10px">
+        <div style="background-color: #5C5C5C; border-radius: 30px; padding: 20px">
             <div class = "flexer column" > 
-                <input onchange="manageUnit()" placeholder="Name" id="nutrientName" list="suggestions" class = "placeholderGray  center text whiteT hoverable grayHover paddingLow" style = "background-color: #5C5C5C;margin: 15px;  border:2px solid #1e1e1e; border-radius:5px;  font-family: 'Lexend Deca'">
+                <input onchange="manageUnit()" placeholder="Name" id="nutrientName" list="suggestions" class = "placeholderGray  center text whiteT hoverable grayHover paddingLow" style = "background-color: #5C5C5C;margin: 30px;  border:4px solid #1e1e1e; border-radius:10px;  font-family: 'Lexend Deca'">
                 <datalist id="suggestions">
                     ` + buildSuggestions() + `
                 </datalist>
                 <div class = "flexer row" style = "align-items: center">
-                    <input onclick="manageUnit()" placeholder="Amount" type="number" id="nutrientAmount" class = "placeholderGray center text whiteT hoverable grayHover paddingLow" style = "background-color: #5C5C5C;margin: 15px;  border:2px solid #1e1e1e; border-radius:5px; font-family: 'Lexend Deca'">
-                    <input list="suggestionsUnit" placeholder="Unit"  id="nutrientUnit" class = "placeholderGray center text whiteT hoverable grayHover paddingLow" style = " width: 50px; background-color: #5C5C5C;margin: 15px;  border:2px solid #1e1e1e; border-radius:5px; font-family: 'Lexend Deca'">
+                    <input onclick="manageUnit()" placeholder="Amount" type="number" id="nutrientAmount" class = "placeholderGray center text whiteT hoverable grayHover paddingLow" style = "background-color: #5C5C5C;margin: 30px;  border:4px solid #1e1e1e; border-radius:10px; font-family: 'Lexend Deca'">
+                    <input list="suggestionsUnit" placeholder="Unit"  id="nutrientUnit" class = "placeholderGray center text whiteT hoverable grayHover paddingLow" style = " width: 100px; background-color: #5C5C5C;margin: 30px;  border:4px solid #1e1e1e; border-radius:10px; font-family: 'Lexend Deca'">
                     <datalist id="suggestionsUnit">
                     </datalist>
                 </div>
@@ -417,8 +422,8 @@ async function confirmEditNutrient(nutrientNumber) {
         <div class = "text grayT fontMid noPadding">`+ name +`</div>
         <div class = "flexer row">
             <div class = "text grayT fontMid noPadding">`+amount+ " " + unitName + `</div>
-            <div onclick="editNutrient(`+nutrientNumber+`)"class = "text backgroundT fontMid" style = "margin-left: 20px;">E</div>
-            <div onclick="deleteNutrient(`+nutrientNumber+`)"class = "text backgroundT fontMid" style = "margin-left: 20px;">X</div>
+            <div onclick="editNutrient(`+nutrientNumber+`)"class = "text backgroundT fontMid" style = "margin-left: 40px;">E</div>
+            <div onclick="deleteNutrient(`+nutrientNumber+`)"class = "text backgroundT fontMid" style = "margin-left: 40px;">X</div>
         </div>
     `
     document.getElementById("nutrientEditWindow").remove();
@@ -449,19 +454,19 @@ async function confirmAddIngredientWindow() {
     }
 
     document.getElementById("plate").innerHTML += `
-        <div id = "i_`+ ingredientsSequence +`" class="flexer column clickablePlateColor" style = "padding: 10px; margin-top: 5px">
+        <div id = "i_`+ ingredientsSequence +`" class="flexer column clickablePlateColor" style = "padding: 20px; margin-top: 10px">
             <div class="flexer row space-between">
                 <div class = "flexer text grayT" style = "align-items: center;">
                     ` + ingredientName + `
                 </div>
-                <div onclick ="editIngredient(`+ ingredientsSequence +`)" class="text backgroundT fontMid" style="margin-left: 20px;">E</div>
-                <div onclick ="deleteIngredient(`+ ingredientsSequence +`)" class="text backgroundT fontMid" style="margin-left: 20px;">X</div>
+                <div onclick ="editIngredient(`+ ingredientsSequence +`)" class="text backgroundT fontMid" style="margin-left: 40px;">E</div>
+                <div onclick ="deleteIngredient(`+ ingredientsSequence +`)" class="text backgroundT fontMid" style="margin-left: 40px;">X</div>
             </div>
-            <div class="flexer row space-between" style = "margin-top: 10px">
+            <div class="flexer row space-between" style = "margin-top: 20px">
                 <div class = "flexer text grayT" style = "align-items: center;">
                     ` + bestNutrientName + `
                 </div>
-                <div class="text grayT fontMid" style="margin-left: 20px;">` + amount + " " + unitBest + `</div>
+                <div class="text grayT fontMid" style="margin-left: 40px;">` + amount + " " + unitBest + `</div>
             </div>
         </div>
     `
@@ -500,14 +505,14 @@ async function confirmEditIngredientWindow(number) {
                 <div class = "flexer text grayT" style = "align-items: center;">
                     ` + ingredientName + `
                 </div>
-                <div onclick ="editIngredient(`+ number +`)" class="text backgroundT fontMid" style="margin-left: 20px;">E</div>
-                <div onclick ="deleteIngredient(`+ number +`)" class="text backgroundT fontMid" style="margin-left: 20px;">X</div>
+                <div onclick ="editIngredient(`+ number +`)" class="text backgroundT fontMid" style="margin-left: 40px;">E</div>
+                <div onclick ="deleteIngredient(`+ number +`)" class="text backgroundT fontMid" style="margin-left: 40px;">X</div>
             </div>
-            <div class="flexer row space-between" style = "margin-top: 10px">
+            <div class="flexer row space-between" style = "margin-top: 20px">
                 <div class = "flexer text grayT" style = "align-items: center;">
                     ` + bestNutrientName + `
                 </div>
-                <div class="text grayT fontMid" style="margin-left: 20px;">` + amount + " " + unitBest + `</div>
+                <div class="text grayT fontMid" style="margin-left: 40px;">` + amount + " " + unitBest + `</div>
             </div>
     `
     closeAddIngredientWindow();
@@ -516,16 +521,16 @@ async function confirmEditIngredientWindow(number) {
 async function editIngredient(ingredientNumber)  {
     nutrientsSequence = 0;
     document.body.insertAdjacentHTML('beforeend', `
-    <div id = "addIngredientWindow" class = "backgroundColor"style="position: absolute; display: flex; flex-direction:column;top: 0px; left: 0px; width:100%; height : 100vh">
+    <div id = "addIngredientWindow" class = "backgroundColor"style="position: absolute; display: flex; flex-direction:column;top: 0px; left: 0px; width:100%; height : 100vh; height : 100dvh">
         <div class = "text grayT paddingHigh">
                 Editing ingredient ` + ingredients.get(ingredientNumber).name + `
             </div>
         <div class="horizontalDivider grayBG"></div>
-        <div class = "clickablePlate clickablePlateColor" style = "margin-top:15px; margin-bottom: 15px;">
+        <div class = "clickablePlate clickablePlateColor" style = "margin-top:30px; margin-bottom: 30px;">
             <div class = "left text grayT">Name</div>
             <input placeholder="optional" id="ingredientDescription" class = "clickablePlateColor center text whiteT hoverable grayHover paddingLow" style = "text-align:end; border:none; font-family: 'Lexend Deca'">
         </div>   
-        <div class = "clickablePlate clickablePlateColor" style = "margin-top:15px; margin-bottom: 15px;">
+        <div class = "clickablePlate clickablePlateColor" style = "margin-top:30px; margin-bottom: 30px;">
             <div class = "left text grayT">Grams</div>
             <input placeholder="100.0" type="number" step="any" id="unitsAmount" class = "clickablePlateColor center text whiteT hoverable grayHover paddingLow" style = "text-align:end; border:none; font-family: 'Lexend Deca'">
         </div>  
@@ -534,10 +539,10 @@ async function editIngredient(ingredientNumber)  {
             <div class = "text grayT paddingHigh">
                 Nutrients per 100g
             </div>
-            <div onclick = "loadFromDb()" class = "flexer text whiteT textButton" style = "align-items: center">
+            <div onclick = "loadFromDb()" class = "flexer text whiteT textButton" style = "align-items: center; text-align:center">
                 Load from database
             </div>
-            <div onclick = "loadIngredientFromStarred()" class = "flexer text whiteT textButton" style = "align-items: center">
+            <div onclick = "loadIngredientFromStarred()" class = "flexer text whiteT textButton" style = "align-items: center; text-align:center ">
                 Load from starred
             </div>    
         </div>
@@ -566,12 +571,12 @@ async function editIngredient(ingredientNumber)  {
         amount = ingredient.nutrientsPUnit[i].amount;
         unitName = ingredient.nutrientsPUnit[i].nutrient.unitName;
         document.getElementById("nutrientsTable").innerHTML += `
-        <div id = n_` + nutrientsSequence + ` class = "flexer row space-between clickablePlate clickablePlateColor" style = "padding-left: 5px; padding-right: 5px;">
+        <div id = n_` + nutrientsSequence + ` class = "flexer row space-between clickablePlate clickablePlateColor" style = "padding-left: 10px; padding-right: 10px;">
             <div class = "text grayT fontMid noPadding">`+ name +`</div>
             <div class = "flexer row">
                 <div class = "text grayT fontMid noPadding">`+amount + " " + unitName +`</div>
-                <div onclick="editNutrient(`+nutrientsSequence+`)"class = "text backgroundT fontMid" style = "margin-left: 20px;">E</div>
-                <div onclick="deleteNutrient(`+nutrientsSequence+`)"class = "text backgroundT fontMid" style = "margin-left: 20px;">X</div>
+                <div onclick="editNutrient(`+nutrientsSequence+`)"class = "text backgroundT fontMid" style = "margin-left: 40px;">E</div>
+                <div onclick="deleteNutrient(`+nutrientsSequence+`)"class = "text backgroundT fontMid" style = "margin-left: 40px;">X</div>
             </div>
         </div>
         `;
@@ -642,12 +647,12 @@ function loadIngredientFromStarred() {
                         nutrients.set(nutrientsSequence, { amount, nutrient });
                         nutrientsSet.add(name);
                         document.getElementById("nutrientsTable").innerHTML += `
-                            <div id = n_`+nutrientsSequence+` class = "flexer row space-between clickablePlate clickablePlateColor" style = "padding-left: 5px; padding-right: 5px;">
+                            <div id = n_`+nutrientsSequence+` class = "flexer row space-between clickablePlate clickablePlateColor" style = "padding-left: 10px; padding-right: 10px;">
                                 <div class = "text grayT fontMid noPadding">`+ name +`</div>
                                 <div class = "flexer row">
                                     <div class = "text grayT fontMid noPadding">`+amount+ " " + unit + `</div>
-                                    <div onclick="editNutrient(`+nutrientsSequence+`)"class = "text backgroundT fontMid" style = "margin-left: 20px;">E</div>
-                                    <div onclick="deleteNutrient(`+nutrientsSequence+`)"class = "text backgroundT fontMid" style = "margin-left: 20px;">X</div>
+                                    <div onclick="editNutrient(`+nutrientsSequence+`)"class = "text backgroundT fontMid" style = "margin-left: 40px;">E</div>
+                                    <div onclick="deleteNutrient(`+nutrientsSequence+`)"class = "text backgroundT fontMid" style = "margin-left: 40px;">X</div>
                                 </div>
                             </div>
                         `
@@ -686,12 +691,12 @@ function loadFromDb() {
                     nutrients.set(nutrientsSequence, { amount, nutrient });
                     nutrientsSet.add(nutrient.name);
                     document.getElementById("nutrientsTable").innerHTML += `
-                        <div id = n_`+nutrientsSequence+` class = "flexer row space-between clickablePlate clickablePlateColor" style = "padding-left: 5px; padding-right: 5px;">
+                        <div id = n_`+nutrientsSequence+` class = "flexer row space-between clickablePlate clickablePlateColor" style = "padding-left: 10px; padding-right: 10px;">
                             <div class = "text grayT fontMid noPadding">`+ name +`</div>
                             <div class = "flexer row">
                                 <div class = "text grayT fontMid noPadding">`+amount+ " " + unit + `</div>
-                                <div onclick="editNutrient(`+nutrientsSequence+`)"class = "text backgroundT fontMid" style = "margin-left: 20px;">E</div>
-                                <div onclick="deleteNutrient(`+nutrientsSequence+`)"class = "text backgroundT fontMid" style = "margin-left: 20px;">X</div>
+                                <div onclick="editNutrient(`+nutrientsSequence+`)"class = "text backgroundT fontMid" style = "margin-left: 40px;">E</div>
+                                <div onclick="deleteNutrient(`+nutrientsSequence+`)"class = "text backgroundT fontMid" style = "margin-left: 40px;">X</div>
                             </div>
                         </div>
                     `
@@ -899,19 +904,19 @@ async function addIngredient(ingredient) {
     name = ingredient.name
     if (name == "") name = "No name"
     document.getElementById("plate").innerHTML += `
-        <div id = "i_`+ ingredientsSequence +`" class="flexer column clickablePlateColor" style = "padding: 10px; margin-top: 5px">
+        <div id = "i_`+ ingredientsSequence +`" class="flexer column clickablePlateColor" style = "padding: 20px; margin-top: 10px">
             <div class="flexer row space-between">
                 <div class = "flexer text grayT" style = "align-items: center;">
                     ` + name + `
                 </div>
-                <div onclick ="editIngredient(`+ ingredientsSequence +`)" class="text backgroundT fontMid" style="margin-left: 20px;">E</div>
-                <div onclick ="deleteIngredient(`+ ingredientsSequence +`)" class="text backgroundT fontMid" style="margin-left: 20px;">X</div>
+                <div onclick ="editIngredient(`+ ingredientsSequence +`)" class="text backgroundT fontMid" style="margin-left: 40px;">E</div>
+                <div onclick ="deleteIngredient(`+ ingredientsSequence +`)" class="text backgroundT fontMid" style="margin-left: 40px;">X</div>
             </div>
-            <div class="flexer row space-between" style = "margin-top: 10px">
+            <div class="flexer row space-between" style = "margin-top: 20px">
                 <div class = "flexer text grayT" style = "align-items: center;">
                     ` + bestNutrientName + `
                 </div>
-                <div class="text grayT fontMid" style="margin-left: 20px;">` + amount + " " + await unitsMap.get(bestNutrientName) + `</div>
+                <div class="text grayT fontMid" style="margin-left: 40px;">` + amount + " " + await unitsMap.get(bestNutrientName) + `</div>
             </div>
         </div>
     `
@@ -957,6 +962,7 @@ async function start() {
                     
                     if (dailyGoals.length == 0) {
                         document.getElementById("todayTopNutrient").innerHTML = "No goals set"
+                        return;
                     }
                     eaten = res2.get(dailyGoals[0].nutrient.name+"|"+dailyGoals[0].nutrient.unitName);
                     if (eaten === undefined) eaten = 0;

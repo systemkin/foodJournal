@@ -99,12 +99,16 @@ async function getMeals(start, end) {
         console.error("Error fetching data:", error)
     }
 }
+async function logoff() {
+    await fetch("/logoff") 
+    window.location.href = "/login.html"
+}
 async function buildNutrients(start, end) {
     counter = 0;
     journal = document.getElementById("journalHolder");
     document.body.insertAdjacentHTML('beforeend', `
         <div id="infoWindow" style="display:flex; width:100%;height: 100%;position: absolute;justify-content: center;align-content: center;align-items: center;"> 
-            <div style="background-color: #5C5C5C; border-radius: 15px; padding: 10px">
+            <div style="background-color: #5C5C5C; border-radius: 30px; padding: 20px">
                 <div class = "flexer column" > 
                     <div class = "text grayT">Processing... (usually takes a moment)</div>
                 </div>
@@ -131,7 +135,7 @@ async function buildNutrients(start, end) {
                     
 
                     toAdd = `
-                    <div draggable="true" ondragstart="start1()" ondragover="dragover()" id = "a_`+counter+ `" class = "flexer row clickablePlateColor" style = "margin-bottom: 5px; padding: 10px; justify-content: space-between;">
+                    <div draggable="true" ondragstart="start1()" ondragover="dragover()" id = "a_`+counter+ `" class = "flexer row clickablePlateColor" style = "margin-bottom: 10px; padding: 20px; justify-content: space-between;">
                         <div class = "flexer column" style =  "justify-content: space-between"> 
                             <div class = "text grayT"> `+ dailyGoals[i].nutrient.name +` </div>
                             <div class = "text grayT"> `+ Math.round(eaten) + "/" + Math.round(dailyGoals[i].amount*mul) +" " + dailyGoals[i].nutrient.unitName + ` </div>
@@ -142,7 +146,7 @@ async function buildNutrients(start, end) {
                                 <div id = "2_`+ counter + `" class="circleSegment midHover clickablePlateColor"></div>
                                 <div class="backgroundedText absolute clickablePlateColor borderMid text grayT">`+ Math.round(percent*100) +`%</div>
                             </div>
-                            <div class = "flexer column" style =  "justify-content: space-between; margin-left: 20px"> 
+                            <div class = "flexer column" style =  "justify-content: space-between; margin-left: 40px"> 
                                 <div class = "text grayT" onclick="deleteNutrient(`+counter+`)"> X </div>
                                 <div class = "text grayT"onclick="editNutrient(`+counter+`)"> E </div>
                             </div>
@@ -227,7 +231,7 @@ async function editNutrient(index) {
     if (defaultNutrients.length == 0) {
         document.body.insertAdjacentHTML('beforeend', `
         <div id="nutrientWindow" style="display:flex; width:100%;height: 100%;position: absolute;justify-content: center;align-content: center;align-items: center;"> 
-            <div style="background-color: #5C5C5C; border-radius: 15px; padding: 10px">
+            <div style="background-color: #5C5C5C; border-radius: 30px; padding: 20px">
                 <div class = "flexer column" > 
                     <div class = "text grayT">Loding nutrients... (usually takes 2-5 seconds)</div>
                 </div>
@@ -243,17 +247,17 @@ async function editNutrient(index) {
 
     document.body.insertAdjacentHTML('beforeend', `
     <div id="nutrientWindow" style="display:flex; width:100%;height: 100%;position: absolute;justify-content: center;align-content: center;align-items: center;"> 
-        <div style="background-color: #5C5C5C; border-radius: 15px; padding: 10px">
+        <div style="background-color: #5C5C5C; border-radius: 30px; padding: 20px">
             <div class = "flexer column" > 
-                <input onchange="manageUnit()" value = "`+dailyGoals[index].nutrient.name+`" placeholder="Name" id="nutrientName" list="suggestions" class = "placeholderGray  center text whiteT hoverable grayHover paddingLow" style = "background-color: #5C5C5C;margin: 15px;  border:2px solid #1e1e1e; border-radius:5px;  font-family: 'Lexend Deca'">
+                <input onchange="manageUnit()" value = "`+dailyGoals[index].nutrient.name+`" placeholder="Name" id="nutrientName" list="suggestions" class = "placeholderGray  center text whiteT hoverable grayHover paddingLow" style = "background-color: #5C5C5C;margin: 30px;  border:4px solid #1e1e1e; border-radius:10px;  font-family: 'Lexend Deca'">
                 <datalist id="suggestions">
                     ` + suggestions + `
                 </datalist>
                 <div class = "flexer row" style = "align-items: center">
-                    <input  placeholder="Amount" value = "`+dailyGoals[index].amount +`" type="number" id="nutrientAmount" class = "placeholderGray center text whiteT hoverable grayHover paddingLow" style = "background-color: #5C5C5C;margin: 15px;  border:2px solid #1e1e1e; border-radius:5px; font-family: 'Lexend Deca'">
+                    <input  placeholder="Amount" value = "`+dailyGoals[index].amount +`" type="number" id="nutrientAmount" class = "placeholderGray center text whiteT hoverable grayHover paddingLow" style = "background-color: #5C5C5C;margin: 30px;  border:4px solid #1e1e1e; border-radius:10px; font-family: 'Lexend Deca'">
                 </div>
                 <div class = "flexer row" style = "align-items: center">
-                    <input placeholder="Unit" value = "`+dailyGoals[index].nutrient.unitName +`" id="nutrientUnit" list="suggestions2" class = "placeholderGray center text whiteT hoverable grayHover paddingLow" style = "background-color: #5C5C5C;margin: 15px;  border:2px solid #1e1e1e; border-radius:5px; font-family: 'Lexend Deca'">
+                    <input placeholder="Unit" value = "`+dailyGoals[index].nutrient.unitName +`" id="nutrientUnit" list="suggestions2" class = "placeholderGray center text whiteT hoverable grayHover paddingLow" style = "background-color: #5C5C5C;margin: 30px;  border:4px solid #1e1e1e; border-radius:10px; font-family: 'Lexend Deca'">
                 </div>
                 <datalist id="suggestions2">
                 </datalist>
@@ -376,7 +380,7 @@ async function addNutrient() {
     if (defaultNutrients.length == 0) {
         document.body.insertAdjacentHTML('beforeend', `
         <div id="nutrientWindow" style="display:flex; width:100%;height: 100%;position: absolute;justify-content: center;align-content: center;align-items: center;"> 
-            <div style="background-color: #5C5C5C; border-radius: 15px; padding: 10px">
+            <div style="background-color: #5C5C5C; border-radius: 30px; padding: 20px">
                 <div class = "flexer column" > 
                     <div class = "text grayT">Loding nutrients... (usually takes 2-5 seconds)</div>
                 </div>
@@ -392,17 +396,17 @@ async function addNutrient() {
 
     document.body.insertAdjacentHTML('beforeend', `
     <div id="nutrientWindow" style="display:flex; width:100%;height: 100%;position: absolute;justify-content: center;align-content: center;align-items: center;"> 
-        <div style="background-color: #5C5C5C; border-radius: 15px; padding: 10px">
+        <div style="background-color: #5C5C5C; border-radius: 30px; padding: 20px">
             <div class = "flexer column" > 
-                <input onchange="manageUnit()" placeholder="Name" id="nutrientName" list="suggestions" class = "placeholderGray  center text whiteT hoverable grayHover paddingLow" style = "background-color: #5C5C5C;margin: 15px;  border:2px solid #1e1e1e; border-radius:5px;  font-family: 'Lexend Deca'">
+                <input onchange="manageUnit()" placeholder="Name" id="nutrientName" list="suggestions" class = "placeholderGray  center text whiteT hoverable grayHover paddingLow" style = "background-color: #5C5C5C;margin: 30px;  border:4px solid #1e1e1e; border-radius:10px;  font-family: 'Lexend Deca'">
                 <datalist id="suggestions">
                     ` + suggestions + `
                 </datalist>
                 <div class = "flexer row" style = "align-items: center">
-                    <input  placeholder="Amount" type="number" id="nutrientAmount" class = "placeholderGray center text whiteT hoverable grayHover paddingLow" style = "background-color: #5C5C5C;margin: 15px;  border:2px solid #1e1e1e; border-radius:5px; font-family: 'Lexend Deca'">
+                    <input  placeholder="Amount" type="number" id="nutrientAmount" class = "placeholderGray center text whiteT hoverable grayHover paddingLow" style = "background-color: #5C5C5C;margin: 30px;  border:4px solid #1e1e1e; border-radius:10px; font-family: 'Lexend Deca'">
                 </div>
                 <div class = "flexer row" style = "align-items: center">
-                    <input placeholder="Unit" id="nutrientUnit" list="suggestions2" class = "placeholderGray center text whiteT hoverable grayHover paddingLow" style = "background-color: #5C5C5C;margin: 15px;  border:2px solid #1e1e1e; border-radius:5px; font-family: 'Lexend Deca'">
+                    <input placeholder="Unit" id="nutrientUnit" list="suggestions2" class = "placeholderGray center text whiteT hoverable grayHover paddingLow" style = "background-color: #5C5C5C;margin: 30px;  border:4px solid #1e1e1e; border-radius:10px; font-family: 'Lexend Deca'">
                 </div>
                 <datalist id="suggestions2">
                 </datalist>
@@ -538,7 +542,7 @@ async function putGoals(dailyGoals) {
         const response = await fetch("dailygoals", {
             method: "PUT",
             headers: {
-                "Content-Type": "application/json",
+                "Content-Type": "application/json"
             },
             body: JSON.stringify(dailyGoals)
         }) 
@@ -570,7 +574,7 @@ async function buildMeals(start, end) {
     journal = document.getElementById("journalHolder");
     document.body.insertAdjacentHTML('beforeend', `
         <div id="infoWindow" style="display:flex; width:100%;height: 100%;position: absolute;justify-content: center;align-content: center;align-items: center;"> 
-            <div style="background-color: #5C5C5C; border-radius: 15px; padding: 10px">
+            <div style="background-color: #5C5C5C; border-radius: 30px; padding: 20px">
                 <div class = "flexer column" > 
                     <div class = "text grayT">Processing... (usually takes a moment)</div>
                 </div>
@@ -599,12 +603,12 @@ async function buildMeals(start, end) {
                     if (name == "") name = "No name"
 
                     toAdd = `
-                    <div id = "m_ `+counter+ `" class = "flexer row clickablePlateColor" style = "margin-bottom: 5px; padding: 10px; justify-content: flex-start;">
-                        <div style = "width:60px; height:60px; margin-right:20px; border-radius: 5px">
+                    <div id = "m_ `+counter+ `" class = "flexer row clickablePlateColor" style = "margin-bottom: 10px; padding: 20px; justify-content: flex-start;">
+                        <div style = "width:60px; height:60px; margin-right:40px; border-radius: 10px">
                             <a href = '`+image+`' target="_blank">
                                 <img style = "height: 100%;
                                     width: 100%;
-                                    object-fit: cover; border-radius: 10px; border: 1px solid black" src = '`+image+`'> 
+                                    object-fit: cover; border-radius: 20px; border: 2px solid black" src = '`+image+`'> 
                             </a>
                         </div>
                         <div class = "flexer column" style =  "justify-content: space-between; flex: 1;" onclick = "showDetailed('`+meals[i].id+`')"> 
@@ -613,7 +617,7 @@ async function buildMeals(start, end) {
                             
                         </div>
 
-                            <div class = "flexer column" style =  "justify-content: space-between; margin-left: 20px; align-items: flex-end;"> 
+                            <div class = "flexer column" style =  "justify-content: space-between; margin-left: 40px; align-items: flex-end;"> 
                                 <div class = "text grayT" onclick="deleteMeal('`+meals[i].id+`')"> X </div>
                                 <div class = "text grayT"onclick="editMeal('`+meals[i].id+`')"> E </div>
                             </div>
@@ -638,7 +642,7 @@ async function showDetailed(id) {
         var result = await countMeals([meal]);
         var toAdd = `
         <div id="detailedInfo" style="display:flex; width:100%;height: 100%;position: absolute;justify-content: center;align-content: center;align-items: center;">
-            <div style="background-color: #5C5C5C; border-radius: 15px; padding: 10px">
+            <div style="background-color: #5C5C5C; border-radius: 30px; padding: 20px">
                 <div class = "flexer column">
         `
         result.forEach((value, key) => {
@@ -646,7 +650,7 @@ async function showDetailed(id) {
                     <div class = "flexer row space-between">
                         <div class = "text grayT" >`+key+ `
                         </div>
-                        <div class = "text grayT"style = "margin-left:5px"> `+ value + " " + unitsMap.get(key) + `
+                        <div class = "text grayT"style = "margin-left:10px"> `+ value + " " + unitsMap.get(key) + `
                         </div>
                         
                     </div>`

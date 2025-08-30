@@ -9,9 +9,9 @@ body {
     height: 100vh;
 }
 .header {
-    padding-left: 5px;
-    padding-right: 5px;
-    height: 50px;
+    padding-left: 10px;
+    padding-right: 10px;
+    height: 100px;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
@@ -24,6 +24,7 @@ body {
     flex:1
 }
 .text {
+    font-size: 32px;
     user-select: none;
 }
 .text.whiteT {
@@ -40,15 +41,15 @@ body {
     color: #BEBEBE;
 }
 .fontNormal {
-    font-size: 16px;
-}
-.fontBig {
     font-size: 32px;
 }
+.fontBig {
+    font-size: 64px;
+}
 .circleNormal {
-    width: 44px;
-    height: 44px;
-    border-radius: 22px;
+    width: 88px;
+    height: 88px;
+    border-radius: 44px;
 }
 .center {
     display: flex;
@@ -57,7 +58,7 @@ body {
 }
 
 .horizontalDivider {
-    height: 1px;
+    min-height: 2px;
     width: 100%;
     margin: 1px;
 }
@@ -84,25 +85,25 @@ body {
 }
 
 .paddingLow {
-    padding: 5px;
-}
-.paddingMid {
     padding: 10px;
 }
-.paddingHigh {
-    padding: 15px;
-}
-.paddingHigher {
+.paddingMid {
     padding: 20px;
 }
+.paddingHigh {
+    padding: 30px;
+}
+.paddingHigher {
+    padding: 40px;
+}
 .paddingVerticalLow {
-    padding-top: 5px;
-    padding-bottom: 5px;
+    padding-top: 10px;
+    padding-bottom: 10px;
 }
 
 .paddingVerticalHigh {
-    padding-top: 15px;
-    padding-bottom: 15px;
+    padding-top: 30px;
+    padding-bottom: 30px;
 }
 
 .ringSegmentHolder{
@@ -112,21 +113,21 @@ body {
     align-items: center;
 }
 .ringSegmentHolder.mid{
-    width: 100px;
-    height: 100px;
+    width: 200px;
+    height: 200px;
 }
 .circleSegment {
   border-radius: 50%;
 }
 
 .circleSegment.mid {
-    width: 50px;
-    height: 50px;
+    width: 100px;
+    height: 100px;
 }
 .circleSegment.midHover {
     position: absolute;
-    width: 35px;
-    height: 35px;
+    width: 70px;
+    height: 70px;
 
 }
 .backgroundColor {
@@ -139,30 +140,30 @@ body {
     position: absolute;
 }
 .borderMid {
-    border-radius: 5px;
+    border-radius: 10px;
 }
 .borderHigh {
-    border-radius: 20px;
+    border-radius: 40px;
 }
 .marginHigh {
-    margin: 30px
+    margin: 60px
 }
 .clickablePlate {
-    margin-top:4px;
-    margin-bottom: 4px;
+    margin-top:8px;
+    margin-bottom: 8px;
     display: flex;
     flex-direction: column;
     width: auto;
     height: fit-content;
-    padding: 5px;
-    padding-left: 20px;
-    padding-right: 20px;
+    padding: 10px;
+    padding-left: 40px;
+    padding-right: 40px;
 }
 .textButton {
-    padding: 10px;
-    border-radius: 2px;
-    padding-left: 15px;
-    padding-right: 15px;
+    padding: 20px;
+    border-radius: 4px;
+    padding-left: 30px;
+    padding-right: 30px;
 }
 .textButton:hover {
     transition: 100ms;
@@ -181,23 +182,25 @@ body {
     justify-content: space-around;
 }
 .radioActive {
-    border: solid 3px #C0E38D;
+    font-size: 32px;
+    border: solid 6px #C0E38D;
     border-radius: 100vh;
     background-color: #C0E38D;
     color: black;
-    padding: 10px;
-    padding-bottom: 5px;
-    padding-top: 5px;
-    min-width: 90px;
+    padding: 20px;
+    padding-bottom: 10px;
+    padding-top: 10px;
+    min-width: 180px;
 }
 .radioUnactive {
+    font-size: 32px;
     border-radius: 100vh;
-    border: solid 3px white;
+    border: solid 6px white;
     color: white;
-    padding: 10px;
-    padding-bottom: 5px;
-    padding-top: 5px;
-    min-width: 90px;
+    padding: 20px;
+    padding-bottom: 10px;
+    padding-top: 10px;
+    min-width: 180px;
 }
 input.placeholderGrayBlack {
 

@@ -26,7 +26,7 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonIgnoreUnknownKeys
 import kotlinx.serialization.decodeFromString
 import io.ktor.http.HttpStatusCode
-
+import java.io.File
 
 fun checkGoalsValidity(goals: List<Nutrient>): Boolean {
     return !(goals.map { it.nutrient?.name }.distinct().size != goals.size)
@@ -49,6 +49,10 @@ fun Application.configureRouting() {
     }
 
     routing {
+        val staticBaseDir = File("src/main/resources/static")
+        get("/login.html") {
+            call.respondFile(staticBaseDir.resolve("login.html"))
+        }
         authenticate("auth-oauth-yandex") {
             get("/auth/yandex") {
                 call.respondText(text = "Logged in", status = HttpStatusCode.OK)
@@ -233,9 +237,12 @@ fun Application.configureRouting() {
                 }
             }
         }
+         
         authenticate("user_session") {
-            staticResources("/", "static")
-
+            
+            staticResources("/", "static") {
+                exclude { file -> file.path.contains("login.html") }
+            }
             get("/meals/{id}") {
                 val session = call.sessions.get<UserSession>()
                 val id = call.parameters["id"]
@@ -420,11 +427,21 @@ fun Application.configureRouting() {
                 var user = usersRepository.getById(ObjectId(session?.id));
                 user!!.dailyGoals = newGoals;
                 usersRepository.update(user);
+
+                val host = call.request.header("Host")
+
+                println("Host=$host")
+
                 call.respond(HttpStatusCode.Created, "Created")
+
+                
             }
             get("/defaultnutrients") {
                 
                 call.respond(foodsViewer.getUniqueNutrientNames());
+            }
+            get("/logoff") {
+                call.sessions.set<UserSession>(null);
             }
         }
     }
