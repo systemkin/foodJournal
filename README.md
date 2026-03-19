@@ -1,3 +1,6 @@
+foodnotes.ru
+
+
 # foodJournal
 # Uni project
 
