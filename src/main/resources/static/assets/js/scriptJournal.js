@@ -604,7 +604,7 @@ async function buildMeals(start, end) {
 
                     toAdd = `
                     <div id = "m_ `+counter+ `" class = "flexer row clickablePlateColor" style = "margin-bottom: 10px; padding: 20px; justify-content: flex-start;">
-                        <div style = "width:60px; height:60px; margin-right:40px; border-radius: 10px">
+                        <div style = "width:100px; height:100px; margin-right:40px; border-radius: 10px">
                             <a href = '`+image+`' target="_blank">
                                 <img style = "height: 100%;
                                     width: 100%;

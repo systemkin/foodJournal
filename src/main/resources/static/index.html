@@ -6,102 +6,108 @@
     <link rel="stylesheet" href="assets/css/styles.css" />
     
 </head>
-<body class = "backgroundColor flexer column" style = "height: 100vh; height: 100dvh">
-    <div class="header headerColor">
-        <div class="button fontBig circleNormal center text">?</div>
-        <div class="flexHolder"></div>
-        <div id ="nicknameHolder" class="text grayT fontMid marginLow"></div>
-        <div class="button fontBig circleNormal center text" onclick="logoff()">Q</div>
-    </div>
-    
-    <div class="flexer space-between center align-center paddingHigher paddingVerticalHigh">
-        <div id = "todayTopNutrient" class = "text" style = "color: #777474"></div>
-        <div class="text whiteT textButton">Goals</div>
-    </div>
-    <div class="horizontalDivider grayBG"></div>
-
-    <div id = "scroller" style="flex:1; overflow: scroll;">
-        <div class = "clickablePlate clickablePlateColor">
-            <div class = "left text grayT">Time</div>
-            <input type="datetime-local" id="mealTime" class = "clickablePlateColor text whiteT hoverable grayHover paddingLow" style = "width:100%; display: flex; flex-direction: row-reverse;   border:none; font-family: 'Lexend Deca'">
-
-        </div>
-        <div class = "clickablePlate clickablePlateColor">
-            <div class = "left text grayT">Description</div>
-            <input list="suggestions0" placeholder="optional" id="mealDescription" oninput="descriptionMealChanged()" class = "clickablePlateColor center text whiteT hoverable grayHover paddingLow" style = "text-align:end; border:none; font-family: 'Lexend Deca'">
-            <datalist id="suggestions0">
-            </datalist>  
-        </div>
-        <div class = "clickablePlate clickablePlateColor">
-            <div class = "left text grayT">Image</div>
-            <label id ="fileLabel" for="filePicker" style = "color :white;margin-bottom:10px; margin-top: 10px; text-align: end; font-size:28px ;">Click to upload</label>
-            <input id="filePicker" type="file" accept=".webp,.jpg,.jpeg,.png,.heic" onchange="addPhoto()" style="display: none;">
+<body class = "flexer row" style = "height: 100vh; height: 100dvh;">
+    <div id = "leftWindow" class = "flexHolder sideWindow" ></div>
+    <div class= "centralWindow backgroundColor flexer column flexHolder" style =  "height: 100%;">
+        <div class="header headerColor">
+            <div class="button fontBig circleNormal center text">?</div>
+            <div class="flexHolder"></div>
+            <div id ="nicknameHolder" class="text grayT fontMid marginLow"></div>
+            <div class="button fontBig circleNormal center text" onclick="logoff()">Q</div>
         </div>
         
-        
-        <div class = flexer style="justify-content: center;">
-            <div class = "flexer column clickablePlateColor borderHigh " style="align-items: flex-end; padding-top: 2px; padding-left:40px; padding-right: 40px; padding-bottom: 16px; margin: 40px;">
-                <div class = "text grayT">
-                    Total weight, g
-                </div>
-                <input placeholder="100.0" type = "number" step="any" id="totalUnits" class = "clickablePlateColor center text whiteT hoverable grayHover paddingLow" style = "width: 100px; text-align:end; border:none; font-family: 'Lexend Deca'">
+        <div class="flexer space-between center align-center paddingHigher paddingVerticalHigh">
+            <div id = "todayTopNutrient" class = "text" style = "color: #777474"></div>
+            <div class="text whiteT textButton">Goals</div>
+        </div>
+        <div class="horizontalDivider grayBG"></div>
+
+        <div id = "scroller" style="flex:1; overflow: scroll;">
+            <div class = "clickablePlate clickablePlateColor">
+                <div class = "left text grayT">Time</div>
+                <input type="datetime-local" id="mealTime" class = "clickablePlateColor text whiteT hoverable grayHover paddingLow" style = "width:100%; display: flex; flex-direction: row-reverse;   border:none; font-family: 'Lexend Deca'">
+
             </div>
-            <div class = "flexer column clickablePlateColor borderHigh " style="align-items: flex-end;padding-top: 2px; padding-left:40px; padding-right: 40px; padding-bottom: 16px; margin: 40px;">
-                <div class = "text grayT">
-                    Eaten weight, g
+            <div class = "clickablePlate clickablePlateColor">
+                <div class = "left text grayT">Description</div>
+                <input list="suggestions0" placeholder="optional" id="mealDescription" oninput="descriptionMealChanged()" class = "clickablePlateColor center text whiteT hoverable grayHover paddingLow" style = "text-align:end; border:none; font-family: 'Lexend Deca'">
+                <datalist id="suggestions0">
+                </datalist>  
+            </div>
+            <div class = "clickablePlate clickablePlateColor">
+                <div class = "left text grayT">Image</div>
+                <label id ="fileLabel" for="filePicker" style = "color :white;margin-bottom:10px; margin-top: 10px; text-align: end; font-size:28px ;">Click to upload</label>
+                <input id="filePicker" type="file" accept=".webp,.jpg,.jpeg,.png,.heic" onchange="addPhoto()" style="display: none;">
+            </div>
+            
+            
+            <div class = flexer style="justify-content: center;">
+                <div class = "flexer column clickablePlateColor borderHigh " style="align-items: flex-end; padding-top: 2px; padding-left:40px; padding-right: 40px; padding-bottom: 16px; margin: 40px;">
+                    <div class = "text grayT">
+                        Total weight, g
+                    </div>
+                    <input placeholder="100.0" type = "number" step="any" id="totalUnits" class = "clickablePlateColor center text whiteT hoverable grayHover paddingLow" style = "width: 100px; text-align:end; border:none; font-family: 'Lexend Deca'">
                 </div>
-                <input placeholder="100.0" type = "number" step="any" id="eatenUnits" class = "clickablePlateColor center text whiteT hoverable grayHover paddingLow" style = "width: 100px; text-align:end; border:none; font-family: 'Lexend Deca'">
+                <div class = "flexer column clickablePlateColor borderHigh " style="align-items: flex-end;padding-top: 2px; padding-left:40px; padding-right: 40px; padding-bottom: 16px; margin: 40px;">
+                    <div class = "text grayT">
+                        Eaten weight, g
+                    </div>
+                    <input placeholder="100.0" type = "number" step="any" id="eatenUnits" class = "clickablePlateColor center text whiteT hoverable grayHover paddingLow" style = "width: 100px; text-align:end; border:none; font-family: 'Lexend Deca'">
+                </div>
+            </div>
+            <div class="horizontalDivider grayBG"></div>
+            
+
+            <div class = "flexer row space-between">
+                    <div class = "text grayT paddingHigh">
+                        Ingredients
+                    </div>
+                    <div onclick = "loadFromStarred()" class = "flexer text whiteT textButton" style = "align-items: center">
+                        Load from starred
+                    </div>  
+                </div>
+            <div class = "noPadding clickablePlate clickablePlateColor ">
+                <div onclick = "showAddIngredientWindow()" class = "center text backgroundT fontBig textButton noPadding" style = "align-items: center">+</div>
+            </div>
+            
+
+
+            <div class = "flexer column flexHolder ">
+                <div id = "plate" class = "flexHolder">
+                    
+                </div>
+                
             </div>
         </div>
         <div class="horizontalDivider grayBG"></div>
-        
-
-        <div class = "flexer row space-between">
-                <div class = "text grayT paddingHigh">
-                    Ingredients
+        <div class ="flexer space-between align-center paddingHigher  ">
+        <div class="flexer textButton" onClick = "changeStarring()">
+                <div class = "flexer text grayT" style = "align-items: center;">
+                    Starr meal
                 </div>
-                <div onclick = "loadFromStarred()" class = "flexer text whiteT textButton" style = "align-items: center">
-                    Load from starred
-                </div>  
-            </div>
-        <div class = "noPadding clickablePlate clickablePlateColor ">
-            <div onclick = "showAddIngredientWindow()" class = "center text backgroundT fontBig textButton noPadding" style = "align-items: center">+</div>
-        </div>
-        
+                <img id = "star" src = "assets/images/emptyStar.png" style = "width: 100px; height: 100px; margin-left: 20px">
 
-
-        <div class = "flexer column flexHolder ">
-            <div id = "plate" class = "flexHolder">
-                
             </div>
-            
+            <div onclick="peekMeal()"class = "flexer text whiteT textButton">
+                Peek
+            </div>
+            <div onclick="confirmMeal()" class = "flexer text whiteT textButton">
+                Confirm
+            </div>
+        </div>   
+
+        <div id = "footer" class = "header headerColor">
+            <div class="button fontBig circleNormal center text" onclick='redirectToJournal()'>J</div>
+            <div class="button fontBig circleNormal center text" style = "border: 2px solid #BEBEBE">A</div>
+            <div class="button fontBig circleNormal center text">S</div>
         </div>
     </div>
-    <div class="horizontalDivider grayBG"></div>
-    <div class ="flexer space-between align-center paddingHigher  ">
-       <div class="flexer textButton" onClick = "changeStarring()">
-            <div class = "flexer text grayT" style = "align-items: center;">
-                Starr meal
-            </div>
-            <img id = "star" src = "assets/images/emptyStar.png" style = "width: 60px; height: 60px; margin-left: 20px">
-        </div>
-        <div onclick="peekMeal()"class = "flexer text whiteT textButton">
-            Peek
-        </div>
-        <div onclick="confirmMeal()" class = "flexer text whiteT textButton">
-            Confirm
-        </div>
-    </div>   
-
-    <div id = "footer" class = "header headerColor">
-        <div class="button fontBig circleNormal center text" onclick='redirectToJournal()'>J</div>
-        <div class="button fontBig circleNormal center text" style = "border: 2px solid #BEBEBE">A</div>
-        <div class="button fontBig circleNormal center text">S</div>
-    </div>
-    
-    
+    <div id = "leftWindow" class = "flexHolder sideWindow"></div>
 
     
 </body>
+    <!-- Barcode scanner -->
+    <script src="https://cdn.jsdelivr.net/npm/@ericblade/quagga2/dist/quagga.min.js"></script>
+    
     <script src = "assets/js/script.js"></script>
 </html>

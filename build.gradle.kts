@@ -71,6 +71,10 @@ dependencies {
     implementation("io.ktor", "ktor-server-tests", "2.3.11")
     testImplementation("io.ktor", "ktor-server-tests", "2.3.11")
     testImplementation("org.jetbrains.kotlin", "kotlin-test-junit", "1.9.10")
+    testImplementation("org.seleniumhq.selenium:selenium-java:4.41.0")
+    testImplementation("org.seleniumhq.selenium:selenium-grid:4.41.0")
+
+
     implementation(kotlin("test"))
 
     implementation("io.ktor", "ktor-serialization-jackson", "2.3.11")

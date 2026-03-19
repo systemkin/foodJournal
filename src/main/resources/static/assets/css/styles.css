@@ -208,3 +208,20 @@ input.placeholderGrayBlack {
 input.placeholderGray::placeholder {
     color: #BEBEBE
 }
+.centralWindow {
+    max-width: 1439px; 
+}
+.sideWindow {
+    background-color: #00020b;
+    display: none;
+}
+@media only screen and (min-width: 1439px) {
+    .centralWindow {
+        min-width: 900px;
+        max-width: 900px;
+    }
+    .sideWindow {
+        display: flex;
+        flex-direction: column;
+    }
+}

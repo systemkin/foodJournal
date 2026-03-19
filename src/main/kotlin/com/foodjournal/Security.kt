@@ -68,8 +68,8 @@ data class UserSession(val id: String)
 
 
 fun Application.getIP(): String {
-    //return "http://192.168.31.183:8080"
-    return environment.config.property("ktor.deployment.address").getString();
+    return "http://localhost:8080"
+    //return environment.config.property("ktor.deployment.address").getString();
 }
 
 fun Application.configureSecurity() {

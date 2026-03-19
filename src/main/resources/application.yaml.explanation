@@ -2,20 +2,17 @@ ktor:
     application:
         modules:
             - com.foodjournal.ApplicationKt.module
+            <Nothing to change>
     deployment:
-        port: 8080
-        sslPort: 443
-        address: "http://localhost"
+        port: 8080 <port to listen for HTTP connections>
+        sslPort: 443 <port to listen for HTTPS connections>
+        address: "https://foodnotes.ru"
     fooddb:
         path: "mongodb://localhost:27017"
         dbname: "foodJournal"
     security:
-        ssl:
+        ssl: 
             keyStore: keystore.jks
             keyAlias: keystorefood
             keyStorePassword: $KEYSTORE_PASSWORD
             privateKeyPassword: $PRIVATEKEY_PASSWORD
-
-
-
-

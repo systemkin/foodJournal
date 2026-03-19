@@ -132,49 +132,82 @@ async function showAddIngredientWindow() {
     nutrientsSequence = 0;
     document.body.style.overflow = "clip";
     document.body.insertAdjacentHTML('beforeend', `
-    <div id = "addIngredientWindow" class = "backgroundColor"style="position: fixed; display: flex; flex-direction:column;top: 0px; left: 0px; width:101%; height: 101vh; height : 100dvh">
-        <div class = "text grayT paddingHigh">
-                Adding ingredient
-            </div>
-        <div class="horizontalDivider grayBG"></div>
-        <div class = "clickablePlate clickablePlateColor" style = "margin-top:30px; margin-bottom: 30px;">
-            <div class = "left text grayT">Name</div>
-            <input list="suggestions3" oninput="descriptionChanged()" placeholder="optional" id="ingredientDescription" class = "clickablePlateColor center text whiteT hoverable grayHover paddingLow" style = "text-align:end; border:none; font-family: 'Lexend Deca'">
-        </div>
-        <datalist id="suggestions3">
-        </datalist>   
-        <div class = "clickablePlate clickablePlateColor" style = "margin-top:30px; margin-bottom: 30px;">
-            <div class = "left text grayT">Grams</div>
-            <input placeholder="100.0" type="number" step="any" id="unitsAmount" class = "clickablePlateColor center text whiteT hoverable grayHover paddingLow" style = "text-align:end; border:none; font-family: 'Lexend Deca'">
-        </div>  
-        <div class="horizontalDivider grayBG"></div>
-        <div class = "flexer row space-between">
+    <div id = "addIngredientWindow" class= "centralWindow backgroundColor flexer column flexHolder" style =  "height: 100%;">
+        <div  class = "backgroundColor"style="position: fixed; display: flex; flex-direction:column;top: 0px; left: 0px; width:101%; height: 101vh; height : 100dvh">
             <div class = "text grayT paddingHigh">
-                Nutrients per 100g
+                    Adding ingredient
+                </div>
+            <div class="horizontalDivider grayBG"></div>
+            <div class = "clickablePlate clickablePlateColor" style = "margin-top:30px; margin-bottom: 30px;">
+                <div class = "left text grayT">Name</div>
+                <input list="suggestions3" oninput="descriptionChanged()" placeholder="optional" id="ingredientDescription" class = "clickablePlateColor center text whiteT hoverable grayHover paddingLow" style = "text-align:end; border:none; font-family: 'Lexend Deca'">
             </div>
-            <div onclick = "loadFromDb()" class = "flexer text whiteT textButton" style = "align-items: center; text-align:center">
-                Load from database
+            <datalist id="suggestions3">
+            </datalist>   
+            <div class = "clickablePlate clickablePlateColor" style = "margin-top:30px; margin-bottom: 30px;">
+                <div class = "left text grayT">Grams</div>
+                <input placeholder="100.0" type="number" step="any" id="unitsAmount" class = "clickablePlateColor center text whiteT hoverable grayHover paddingLow" style = "text-align:end; border:none; font-family: 'Lexend Deca'">
+            </div>  
+            <div class="horizontalDivider grayBG"></div>
+            <div class = "flexer row space-between">
+                <div class = "text grayT paddingHigh">
+                    Nutrients per 100g
+                </div>
+                <div onclick = "loadFromDb()" class = "flexer text whiteT textButton" style = "align-items: center; text-align:center">
+                    Load from database
+                </div>
+                <div onclick = "loadIngredientFromStarred()" class = "flexer text whiteT textButton" style = "align-items: center; text-align:center">
+                    Load from starred
+                </div>  
+                <input type="file" id="barcodeImageInput" accept="image/*" />
             </div>
-            <div onclick = "loadIngredientFromStarred()" class = "flexer text whiteT textButton" style = "align-items: center; text-align:center">
-                Load from starred
-            </div>  
-        </div>
-        <div class = "noPadding clickablePlate clickablePlateColor ">
-            <div onclick="showAddNutrient()" class = "center text backgroundT fontBig textButton noPadding" style = "align-items: center">+</div>
-        </div>
-        <div id = "nutrientsTable" class = "flexer column flexHolder"  style = "overflow: scroll">
-        </div>
-        <div class="horizontalDivider grayBG"></div>
-        <div class = "flexer row space-between">
-            <div onclick = "closeAddIngredientWindow()" class = "flexer text whiteT textButton" style = "align-items: center">
-                Cancel
-            </div> 
-            <div onclick = "confirmAddIngredientWindow()" class = "flexer text whiteT textButton" style = "align-items: center">
-                Confirm
-            </div>  
+            <div class = "noPadding clickablePlate clickablePlateColor ">
+                <div onclick="showAddNutrient()" class = "center text backgroundT fontBig textButton noPadding" style = "align-items: center">+</div>
+            </div>
+            <div id = "nutrientsTable" class = "flexer column flexHolder"  style = "overflow: scroll">
+            </div>
+            <div class="horizontalDivider grayBG"></div>
+            <div class = "flexer row space-between">
+                <div onclick = "closeAddIngredientWindow()" class = "flexer text whiteT textButton" style = "align-items: center">
+                    Cancel
+                </div> 
+                <div onclick = "confirmAddIngredientWindow()" class = "flexer text whiteT textButton" style = "align-items: center">
+                    Confirm
+                </div>  
+            </div>
         </div>
     </div>
     `)
+
+    document.getElementById('barcodeImageInput').addEventListener('change', function(event) {
+        debugger;
+        const objectUrl = URL.createObjectURL(event.target.files[0]);
+        Quagga.decodeSingle({
+            decoder: {
+                readers: [
+                "ean_reader",   
+                "upc_reader", 
+                "ean_8_reader", 
+                "upc_e_reader" 
+            ]
+            },
+            locate: true,
+            src: objectUrl
+        }, function(result) {
+            if (result?.codeResult) {
+                console.log("Barcode detected:", result.codeResult.code);
+                fetch("https://world.openfoodfacts.org/api/v0/product/" + result.codeResult.code).then(response => {
+                    response.json().then(json => {
+                        console.log('info:' + JSON.stringify(json));
+                    })
+                })
+                
+            } else {
+                console.log("No barcode detected.");
+            }
+        });
+    });
+
 }
 
 

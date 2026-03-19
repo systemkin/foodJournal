@@ -5,8 +5,7 @@ ktor:
     deployment:
         port: 8080
         sslPort: 443
-        port-external: 443
-        address: "https://foodnotes.ru"
+        address: "http://localhost"
     fooddb:
         path: "mongodb://localhost:27017"
         dbname: "foodJournal"
